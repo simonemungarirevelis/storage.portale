@@ -9,15 +9,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class RicercaAbstract(models.Model):
-    dt_ins = models.DateTimeField(db_column='DT_INS', auto_now_add=True)
-    dt_mod = models.DateTimeField(db_column='DT_MOD', auto_now=True,
-                                  blank=True, null=True)
-
-    class Meta:
-        abstract = True
-
-
 class Personale(models.Model):
     id_ab = models.IntegerField(db_column='ID_AB')
     cd_esterno = models.CharField(db_column='CD_ESTERNO', max_length=60, blank=True, null=True)
@@ -115,6 +106,15 @@ class Personale(models.Model):
                                    self.cognome, self.matricola)
 
 
+class RicercaAbstract(models.Model):
+    dt_ins = models.DateTimeField(db_column='DT_INS', auto_now_add=True)
+    dt_mod = models.DateTimeField(db_column='DT_MOD', auto_now=True,
+                                  blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
 class RicercaAster1(RicercaAbstract):
     descrizione = models.TextField(db_column='DESCRIZIONE',
                                    max_length=200)
@@ -126,11 +126,11 @@ class RicercaAster1(RicercaAbstract):
                                  related_name='user_mod_aster1',
                                  on_delete=models.SET_NULL,
                                  blank=True, null=True)
+
     class Meta:
         db_table = 'RICERCA_ASTER1'
         verbose_name_plural = _("Aster 1")
         ordering = ('descrizione',)
-
 
     def __str__(self):
         return '{}'.format(self.descrizione)
@@ -154,7 +154,6 @@ class RicercaAster2(RicercaAbstract):
         db_table = 'RICERCA_ASTER2'
         verbose_name_plural = _("Aster 2")
         ordering = ('ricerca_aster1',)
-
 
     def __str__(self):
         return '{} {}'.format(self.ricerca_aster1,
@@ -350,3 +349,52 @@ class RicercaLineaBase(RicercaAbstract):
 
     def __str__(self):
         return '{} {}'.format(self.ricerca_erc2, self.descrizione)
+
+
+# ------------------------------------- #
+
+class TerritorioIT(models.Model):
+    cd_catasto = models.CharField(db_column='CD_CATASTO', max_length=255, primary_key=True)
+    cd_istat = models.CharField(db_column='CD_ISTAT', max_length=6, blank=True, null=True)
+    cd_sigla = models.CharField(db_column='CD_SIGLA', max_length=2, blank=True, null=True)
+    cd_770_regio = models.CharField(db_column='CD_770_REGIO', max_length=2, blank=True, null=True)
+    ds_comune = models.CharField(db_column='DS_COMUNE', max_length=255, blank=True, null=True)
+    ds_provincia = models.CharField(db_column='DS_PROVINCIA', max_length=255, blank=True, null=True)
+    ds_regione = models.CharField(db_column='DS_REGIONE', max_length=255, blank=True, null=True)
+
+    class Meta:
+        db_table = 'TERRITORIO_IT'
+        verbose_name_plural = _('Territorio')
+
+    def __str__(self):
+        return '{} {} ({}) '.format(self.cd_catasto,
+                                    self.ds_comune,
+                                    self.ds_provincia)
+
+
+# FIXME: Identico a RicercaAbstract, unificare?
+class DidatticaAbstract(models.Model):
+    dt_ins = models.DateTimeField(db_column='DT_INS', auto_now_add=True)
+    dt_mod = models.DateTimeField(db_column='DT_MOD', auto_now=True, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class DidatticaDipartimento(DidatticaAbstract):
+    dip_id = models.IntegerField(db_column='DIP_ID', primary_key=True)  # FIXME: Autoincrement?
+    dip_cod = models.CharField(db_column='DIP_COD', max_length=40, blank=True, null=True)
+    dip_des_it = models.CharField(db_column='DIP_DES_IT', max_length=255, blank=True, null=True)
+    dip_des_eng = models.CharField(db_column='DIP_DES_ENG', max_length=255, blank=True, null=True)
+    dip_nome_breve = models.CharField(db_column='DIP_NOME_BREVE', max_length=100, blank=True, null=True)
+    dip_cd_csa = models.CharField(db_column='DIP_CD_CSA', max_length=40, blank=True, null=True)
+    miur_dip_id = models.IntegerField(db_column='MIUR_DIP_ID', blank=True, null=True)
+    url_pubbl_off_f = models.CharField(db_column='URL_PUBBL_OFF_F', max_length=255, blank=True, null=True)
+    dip_vis_web_flg = models.IntegerField(db_column='DIP_VIS_WEB_FLG', blank=True, null=True)
+
+    class Meta:
+        db_table = 'DIDATTICA_DIPARTIMENTO'
+        verbose_name_plural = _("Dipartimento")
+
+    def __str__(self):
+        return '{} {}'.format(self.dip_id, self.dip_des_it)

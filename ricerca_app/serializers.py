@@ -71,3 +71,11 @@ class RicercaLineaBaseSerializer(serializers.HyperlinkedModelSerializer):
         model = RicercaLineaBase
         fields = ['descrizione', 'ricerca_erc2',
                   'descr_pubblicaz_prog_brevetto', 'anno']
+
+
+# ------------------------------------- #
+
+class DidatticaDipartimentiListSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = RicercaLineaBase
+        fields = ['dip_id', 'dip_cod', 'dip_nome_breve', 'dip_des_it']

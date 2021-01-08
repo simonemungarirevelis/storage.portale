@@ -26,13 +26,6 @@ class ApiResourceDetail(generics.RetrieveUpdateDestroyAPIView):
 
 # =================================================
 
-class ApiPersonaleHelloWorld(ApiResourceList):
-    description = 'Available Personale, Professors and Researchers'
-    queryset = Personale.objects.filter(nome='HelloWorld')
-    serializer_class = PersonaleSerializer
-
-# =================================================
-
 class ApiPersonaleList(ApiResourceList):
     description = 'Available Personale, Professors and Researchers'
     queryset = Personale.objects.all()
@@ -43,6 +36,7 @@ class ApiPersonaleDetail(ApiResourceDetail):
     description = 'Detail of Persona'
     queryset = Personale.objects.all()
     serializer_class = PersonaleSerializer
+
 
 # =================================================
 
@@ -57,6 +51,7 @@ class ApiRicercaAster1Detail(ApiResourceDetail):
     queryset = RicercaAster1.objects.all()
     serializer_class = RicercaAster1Serializer
 
+
 # =================================================
 
 class ApiRicercaAster2List(ApiResourceList):
@@ -69,6 +64,7 @@ class ApiRicercaAster2Detail(ApiResourceDetail):
     description = 'Aster 2 Details'
     queryset = RicercaAster2.objects.all()
     serializer_class = RicercaAster2Serializer
+
 
 # =================================================
 
@@ -83,6 +79,7 @@ class ApiRicercaErc1Detail(ApiResourceDetail):
     queryset = RicercaErc1.objects.all()
     serializer_class = RicercaErc1Serializer
 
+
 # =================================================
 
 class ApiRicercaErc2List(ApiResourceList):
@@ -96,12 +93,14 @@ class ApiRicercaErc2Detail(ApiResourceDetail):
     queryset = RicercaErc2.objects.all()
     serializer_class = RicercaErc2Serializer
 
+
 # =================================================
 
 class ApiRicercaDocenteGruppoList(ApiResourceList):
     description = 'List of Professors/Researchers in which Research Groups'
     queryset = RicercaDocenteGruppo.objects.all()
     serializer_class = RicercaDocenteGruppoSerializer
+
 
 class ApiRicercaDocenteGruppoDetail(ApiResourceDetail):
     description = 'Details of Professors/Researchers in which Research Groups'
@@ -116,10 +115,12 @@ class ApiRicercaDocenteLineaApplicataList(ApiResourceList):
     queryset = RicercaDocenteLineaApplicata.objects.all()
     serializer_class = RicercaDocenteLineaApplicataSerializer
 
+
 class ApiRicercaDocenteLineaApplicataDetail(ApiResourceDetail):
     description = 'Details of a Professor/Researcher in an Applied Line'
     queryset = RicercaDocenteLineaApplicata.objects.all()
     serializer_class = RicercaDocenteLineaApplicataSerializer
+
 
 # =================================================
 
@@ -127,6 +128,7 @@ class ApiRicercaDocenteLineaBaseList(ApiResourceList):
     description = 'List of Base Lines'
     queryset = RicercaDocenteLineaBase.objects.all()
     serializer_class = RicercaDocenteLineaBaseSerializer
+
 
 class ApiRicercaDocenteLineaBaseDetail(ApiResourceDetail):
     description = 'Details about a Base Line'
@@ -141,10 +143,12 @@ class ApiRicercaGruppoList(ApiResourceList):
     queryset = RicercaGruppo.objects.all()
     serializer_class = RicercaGruppoSerializer
 
+
 class ApiRicercaGruppoDetail(ApiResourceDetail):
     description = 'Details of a Research Group'
     queryset = RicercaGruppo.objects.all()
     serializer_class = RicercaGruppoSerializer
+
 
 # =================================================
 
@@ -153,10 +157,12 @@ class ApiRicercaLineaApplicataList(ApiResourceList):
     queryset = RicercaLineaApplicata.objects.all()
     serializer_class = RicercaLineaApplicataSerializer
 
+
 class ApiRicercaLineaApplicataDetail(ApiResourceDetail):
     description = 'Detail of an Applied Line'
     queryset = RicercaLineaApplicata.objects.all()
     serializer_class = RicercaLineaApplicataSerializer
+
 
 # =================================================
 
@@ -165,7 +171,29 @@ class ApiRicercaLineaBaseList(ApiResourceList):
     queryset = RicercaLineaBase.objects.all()
     serializer_class = RicercaLineaBaseSerializer
 
+
 class ApiRicercaLineaBaseDetail(ApiResourceDetail):
     description = 'Details of a Base Line'
     queryset = RicercaLineaBase.objects.all()
     serializer_class = RicercaLineaBaseSerializer
+
+
+# =================================================
+
+# class ApiPersonaleHelloWorld(ApiResourceList):
+#     description = 'Available Personale, Professors and Researchers'
+#     queryset = Personale.objects.filter(nome='HelloWorld')
+#     serializer_class = PersonaleSerializer
+
+
+# =================================================
+
+# TODO: API views da implementare
+#   - lista dipartimenti + modificare admin.py per aggiungere a lista home (?)
+#   - lista CDS per dipartimento
+#   - lista lingua erogazione per dato CDS
+
+class ApiDidatticaDipartimentiList(ApiResourceList):
+    description = 'Set of all Dipartimenti'
+    queryset = DidatticaDipartimento.objects.all()
+    serializer_class = DidatticaDipartimentiListSerializer
