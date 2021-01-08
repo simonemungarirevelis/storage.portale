@@ -12,6 +12,7 @@ from . serializers import *
 
 class ApiResourceList(generics.ListCreateAPIView):
     permission_classes = [permissions.DjangoModelPermissionsOrAnonReadOnly]
+    allowed_methods = ('GET',)
 
     def perform_create(self, serializer):
         serializer.save(user_ins=self.request.user)
@@ -22,6 +23,13 @@ class ApiResourceDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         serializer.save(user_mod=self.request.user)
+
+# =================================================
+
+class ApiPersonaleHelloWorld(ApiResourceList):
+    description = 'Available Personale, Professors and Researchers'
+    queryset = Personale.objects.filter(nome='HelloWorld')
+    serializer_class = PersonaleSerializer
 
 # =================================================
 

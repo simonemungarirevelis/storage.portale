@@ -59,6 +59,8 @@ if 'rest_framework' in settings.INSTALLED_APPS:
                         name='openapi-schema-json'),
 
     # qui API pubbliche
+    urlpatterns += path('{}/helloworld/'.format(base_url),
+                        api_views.ApiPersonaleHelloWorld.as_view()),
     urlpatterns += path('{}/persone/'.format(base_url),
                         api_views.ApiPersonaleList.as_view()),
     urlpatterns += path('{}/persona/<int:pk>/'.format(base_url),
