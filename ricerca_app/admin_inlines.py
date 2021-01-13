@@ -108,3 +108,20 @@ class RicercaLineaBaseInline(admin.TabularInline):
     autocomplete_fields = ('ricerca_erc2', )
     form = RicercaLineaBaseModelForm
     classes = ['collapse', ]
+
+# ==============================================================
+
+
+# class DidatticaCdsLinguaModelForm(forms.ModelForm):
+#     class Meta:
+#         model = DidatticaCdsLingua
+#         fields = ('__all__')
+#         #exclude = ('user_ins', 'user_mod')
+#
+#
+# class DidatticaCdsLinguaInLine(admin.TabularInline):
+#     model = DidatticaCdsLingua
+#     extra = 0
+#     autocomplete_fields = ('cdsord', )
+#     form = DidatticaCdsLinguaModelForm
+#     classes = ['collapse', ]

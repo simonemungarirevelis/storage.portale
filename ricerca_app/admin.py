@@ -95,3 +95,39 @@ class RicercaLineaBaseAdmin(admin.ModelAdmin):
 class DipartimentoAdmin(admin.ModelAdmin):
     readonly_fields = ('dip_des_it', 'dip_des_eng')
     list_display = ('dip_cod', 'dip_des_it')
+
+
+@admin.register(ComuniAll)
+class ComuniAllAdmin(admin.ModelAdmin):
+    readonly_fields = ()
+    list_display = ()
+
+
+@admin.register(DidatticaCds)
+class DidatticaCdsAdmin(admin.ModelAdmin):
+    readonly_fields = ()
+    list_display = ()
+
+
+@admin.register(DidatticaCdsLingua)
+class DidatticaCdsLinguaAdmin(admin.ModelAdmin):
+    readonly_fields = ()
+    list_display = ()
+
+
+@admin.register(DidatticaRegolamento)
+class DidatticaRegolamentoAdmin(admin.ModelAdmin):
+    readonly_fields = ()
+    list_display = ()
+
+
+@admin.register(DidatticaTestiRegolamento)
+class DidatticaTestiRegolamentoAdmin(admin.ModelAdmin):
+    readonly_fields = ()
+    list_display = ()
+
+
+@admin.register(TerritorioIt)
+class TerritorioItAdmin(admin.ModelAdmin):
+    readonly_fields = ()
+    list_display = ()
