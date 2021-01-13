@@ -31,15 +31,15 @@ agid_api_dict = {'title': "Unical - Ricerca",
                                name='api'),
                           dict(description='description',
                                name='public')],
-                 'contact': dict(email = 'giuseppe.demarco@unical.it',
-                                 name = 'Giuseppe De Marco',
-                                 url = 'https://github.com/UniversitaDellaCalabria'),
+                 'contact': dict(email='giuseppe.demarco@unical.it',
+                                 name='Giuseppe De Marco',
+                                 url='https://github.com/UniversitaDellaCalabria'),
                  'version': "0.1.2"
-}
+                 }
 
 urlpatterns = [
-                # qui le chiamate alle risorse di felix
-                # ...
+    # qui le chiamate alle risorse di felix
+    # ...
 
 ]
 
@@ -54,7 +54,7 @@ if 'rest_framework' in settings.INSTALLED_APPS:
                         name='openapi-schema'),
     # dynamic Schema export resource
     urlpatterns += path('openapi.json',
-                        get_schema_view(renderer_classes = [JSONOpenAPIRenderer],
+                        get_schema_view(renderer_classes=[JSONOpenAPIRenderer],
                                         **agid_api_dict),
                         name='openapi-schema-json'),
 
@@ -113,8 +113,17 @@ if 'rest_framework' in settings.INSTALLED_APPS:
                         api_views.ApiRicercaLineaBaseList.as_view()),
     urlpatterns += path('{}/linea-base/<int:pk>/'.format(base_url),
                         api_views.ApiRicercaLineaBaseDetail.as_view()),
-    # urlpatterns += path('{}/helloworld/'.format(base_url),
-    #                     api_views.ApiPersonaleHelloWorld.as_view()),
-    urlpatterns += path('{}/dipartimenti'.format(base_url),
-                        api_views.ApiDidatticaDipartimentiList.as_view()),
 
+    urlpatterns += path('{}/dipartimenti'.format(base_url),
+                        api_views.ApiDidatticaDipartimentoList.as_view()),
+    urlpatterns += path('{}/dipartimenti/<int:pk>/'.format(base_url),
+                        api_views.ApiDidatticaDipartimentoDetail.as_view()),
+    urlpatterns += path('{}/dipartimenti/<int:pk>/cds'.format(base_url),
+                        api_views.ApiDidatticaCdsInDipartimentoList.as_view()),
+
+    urlpatterns += path('{}/cds'.format(base_url),
+                        api_views.ApiDidatticaCdsList.as_view()),
+    urlpatterns += path('{}/cds/<int:pk>/'.format(base_url),
+                        api_views.ApiDidatticaCdsDetail.as_view()),
+    urlpatterns += path('{}/cds/<int:pk>/lingue'.format(base_url),
+                        api_views.ApiDidatticaLinguePerCdsList.as_view()),

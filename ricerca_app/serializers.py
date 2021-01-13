@@ -7,26 +7,26 @@ class PersonaleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Personale
         # Todo add @properties to Model to hanlde childs elements
-        fields = ['nome', 'cognome',] # 'matricola', 'cod_fis']
+        fields = ['nome', 'cognome', ]  # 'matricola', 'cod_fis']
         #  fields = '__all__'
 
 
 class RicercaAster1Serializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = RicercaAster1
-        fields = ['descrizione',]
+        fields = ['descrizione', ]
 
 
 class RicercaAster2Serializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = RicercaAster2
-        fields = ['descrizione',]
+        fields = ['descrizione', ]
 
 
 class RicercaErc1Serializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = RicercaErc1
-        fields = ['cod_erc1', 'descrizione',]
+        fields = ['cod_erc1', 'descrizione', ]
 
 
 class RicercaErc2Serializer(serializers.HyperlinkedModelSerializer):
@@ -75,7 +75,26 @@ class RicercaLineaBaseSerializer(serializers.HyperlinkedModelSerializer):
 
 # ------------------------------------- #
 
-class DidatticaDipartimentiListSerializer(serializers.HyperlinkedModelSerializer):
+class DidatticaDipartimentoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = RicercaLineaBase
+        model = DidatticaDipartimento
         fields = ['dip_id', 'dip_cod', 'dip_nome_breve', 'dip_des_it']
+
+
+class DidatticaCdsInDipartimentoListSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = DidatticaCds
+        fields = ['cds_id', 'cds_cod', 'nome_cds_it', 'dip_id']
+
+
+class DidatticaCdsSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = DidatticaCds
+        fields = ['cds_id', 'cds_cod', 'nome_cds_it', 'dip_id']
+
+
+# class DidatticaLinguePerCdsListSerializer(serializers.HyperlinkedModelSerializer):
+class DidatticaLinguePerCdsListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DidatticaCdsLingua
+        fields = ['cdsord', 'lingua_des_it', 'lingua_des_eng']

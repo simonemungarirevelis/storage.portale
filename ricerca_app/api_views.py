@@ -20,11 +20,13 @@ class ApiResourceList(generics.ListCreateAPIView):
 
 class ApiResourceDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    allowed_methods = ('GET',)
 
     def perform_update(self, serializer):
         serializer.save(user_mod=self.request.user)
 
 # =================================================
+
 
 class ApiPersonaleList(ApiResourceList):
     description = 'Available Personale, Professors and Researchers'
@@ -180,20 +182,47 @@ class ApiRicercaLineaBaseDetail(ApiResourceDetail):
 
 # =================================================
 
-# class ApiPersonaleHelloWorld(ApiResourceList):
-#     description = 'Available Personale, Professors and Researchers'
-#     queryset = Personale.objects.filter(nome='HelloWorld')
-#     serializer_class = PersonaleSerializer
+# TODO:
+#  - Paginazione: aggiungere paginatore (custom?) a classi astratte || aggiungere paginatore a settings
+#  - admin CRUD classi nuove
 
-
-# =================================================
-
-# TODO: API views da implementare
-#   - lista dipartimenti + modificare admin.py per aggiungere a lista home (?)
-#   - lista CDS per dipartimento
-#   - lista lingua erogazione per dato CDS
-
-class ApiDidatticaDipartimentiList(ApiResourceList):
+class ApiDidatticaDipartimentoList(ApiResourceList):
     description = 'Set of all Dipartimenti'
     queryset = DidatticaDipartimento.objects.all()
-    serializer_class = DidatticaDipartimentiListSerializer
+    serializer_class = DidatticaDipartimentoSerializer
+
+
+class ApiDidatticaDipartimentoDetail(ApiResourceDetail):
+    description = 'Detail of Dipartimento'
+    queryset = DidatticaDipartimento.objects.all()
+    serializer_class = DidatticaDipartimentoSerializer
+
+
+class ApiDidatticaCdsList(ApiResourceList):
+    description = 'Set of all CDS'
+    queryset = DidatticaCds.objects.all()
+    serializer_class = DidatticaCdsSerializer
+
+
+class ApiDidatticaCdsDetail(ApiResourceDetail):
+    description = 'Detail of CDS'
+    queryset = DidatticaCds.objects.all()
+    serializer_class = DidatticaCdsSerializer
+
+
+class ApiDidatticaCdsInDipartimentoList(ApiResourceList):
+    description = 'Set of all CDS in a Dipartimento'
+    serializer_class = DidatticaCdsInDipartimentoListSerializer
+
+    def get_queryset(self):
+        return DidatticaCds.objects.filter(dip_id=self.kwargs['pk'])
+
+
+class ApiDidatticaLinguePerCdsList(ApiResourceList):
+    description = 'Set of all languages a CDS is provided in'
+    serializer_class = DidatticaLinguePerCdsListSerializer
+
+    def get_queryset(self):
+        # cdss = DidatticaCds.objects.filter(cds_id=self.kwargs['pk'])
+        # return DidatticaCdsLingua.objects.filter(cdsord__in=cdss.values('cdsord_id'))
+        return DidatticaCdsLingua.objects.filter(cdsord__cds_id=self.kwargs['pk'])
