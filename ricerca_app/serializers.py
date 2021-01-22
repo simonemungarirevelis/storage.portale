@@ -101,18 +101,7 @@ class RicercaLineaBaseSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CdSListSerializer(serializers.ModelSerializer):
-    # def __init__(self, language, **kwargs):
-    #     super().__init__(**kwargs)
-    #     self.language = language
-    #     self.base_field = [
-    #         'cdsid',
-    #         'academicyear',
-    #         'departmentid',
-    #         'coursetypeid',
-    #         'coursetypename',
-    #         'course'
 
     class Meta:
         model = CdSList
         fields = '__all__'
-
