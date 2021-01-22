@@ -75,26 +75,44 @@ class RicercaLineaBaseSerializer(serializers.HyperlinkedModelSerializer):
 
 # ------------------------------------- #
 
-class DidatticaDipartimentoSerializer(serializers.HyperlinkedModelSerializer):
+# class DidatticaDipartimentoSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = DidatticaDipartimento
+#         fields = ['dip_id', 'dip_cod', 'dip_nome_breve', 'dip_des_it']
+#
+#
+# class DidatticaCdsInDipartimentoListSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = DidatticaCds
+#         fields = ['cds_id', 'cds_cod', 'nome_cds_it', 'dip_id']
+#
+#
+# class DidatticaCdsSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = DidatticaCds
+#         fields = ['cds_id', 'cds_cod', 'nome_cds_it', 'dip_id']
+#
+#
+# # class DidatticaLinguePerCdsListSerializer(serializers.HyperlinkedModelSerializer):
+# class DidatticaLinguePerCdsListSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = DidatticaCdsLingua
+#         fields = ['cdsord', 'lingua_des_it', 'lingua_des_eng']
+
+
+class CdSListSerializer(serializers.ModelSerializer):
+    # def __init__(self, language, **kwargs):
+    #     super().__init__(**kwargs)
+    #     self.language = language
+    #     self.base_field = [
+    #         'cdsid',
+    #         'academicyear',
+    #         'departmentid',
+    #         'coursetypeid',
+    #         'coursetypename',
+    #         'course'
+
     class Meta:
-        model = DidatticaDipartimento
-        fields = ['dip_id', 'dip_cod', 'dip_nome_breve', 'dip_des_it']
+        model = CdSList
+        fields = '__all__'
 
-
-class DidatticaCdsInDipartimentoListSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = DidatticaCds
-        fields = ['cds_id', 'cds_cod', 'nome_cds_it', 'dip_id']
-
-
-class DidatticaCdsSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = DidatticaCds
-        fields = ['cds_id', 'cds_cod', 'nome_cds_it', 'dip_id']
-
-
-# class DidatticaLinguePerCdsListSerializer(serializers.HyperlinkedModelSerializer):
-class DidatticaLinguePerCdsListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DidatticaCdsLingua
-        fields = ['cdsord', 'lingua_des_it', 'lingua_des_eng']

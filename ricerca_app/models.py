@@ -53,8 +53,8 @@ class Personale(models.Model):
         db_column='CD_CAP_RES', max_length=5, blank=True, null=True)
     indirizzo_res = models.CharField(
         db_column='INDIRIZZO_RES', max_length=255, blank=True, null=True)
-    num_civico_res = models.CharField(
-        db_column='NUM_CIVICO_RES', max_length=15, blank=True, null=True)
+    num_civico_res = models.CharField('Numero Civico Residenza',
+                                      db_column='NUM_CIVICO_RES', max_length=15, blank=True, null=True)
     cd_sigla_res = models.CharField(
         db_column='CD_SIGLA_RES', max_length=2, blank=True, null=True)
     id_comu_dom = models.IntegerField(
@@ -455,7 +455,9 @@ class ComuniAll(models.Model):
 
 
 class DidatticaCds(InsModAbstract):
-    cds_id = models.IntegerField(db_column='CDS_ID', primary_key=True)
+    # cds_id = models.AutoField(db_column='CDS_ID', primary_key=True)
+    cds_id = models.IntegerField(
+        db_column='CDS_ID', primary_key=True)  # FIXME: AutoField
     cds_cod = models.CharField(
         db_column='CDS_COD', max_length=10, blank=True, null=True)
     nome_cds_it = models.CharField(
@@ -677,3 +679,43 @@ class TerritorioIt(models.Model):
     class Meta:
         managed = False
         db_table = 'TERRITORIO_IT'
+
+
+class CdSList(models.Model):
+    regdidid = models.IntegerField(db_column='RegDidId', primary_key=True)
+    cdsid = models.IntegerField(db_column='CdSId', blank=True, null=True)
+    academicyear = models.IntegerField(
+        db_column='AcademicYear', blank=True, null=True)
+    cdsnameit = models.CharField(
+        db_column='CdSNameIT', max_length=255, blank=True, null=True)
+    cdsnameeng = models.CharField(
+        db_column='CdSNameENG', max_length=255, blank=True, null=True)
+    departmentid = models.CharField(
+        db_column='DepartmentId', max_length=40, blank=True, null=True)
+    departmentnameit = models.CharField(
+        db_column='DepartmentNameIT', max_length=255, blank=True, null=True)
+    departmentnameeng = models.CharField(
+        db_column='DepartmentNameENG', max_length=255, blank=True, null=True)
+    coursetypeid = models.CharField(
+        db_column='CourseTypeId', max_length=10, blank=True, null=True)
+    coursetypename = models.CharField(
+        db_column='CourseTypeName', max_length=80, blank=True, null=True)
+    courseclassid = models.CharField(
+        db_column='CourseClassId', max_length=10, blank=True, null=True)
+    courseclassname = models.CharField(
+        db_column='CourseClassName', max_length=255, blank=True, null=True)
+    cdslanguageit = models.CharField(
+        db_column='CdsLanguageIT', max_length=100, blank=True, null=True)
+    cdslanguageeng = models.CharField(
+        db_column='CdSLanguageENG', max_length=100, blank=True, null=True)
+    cdsduration = models.IntegerField(
+        db_column='CdSDuration', blank=True, null=True)
+    cdsects = models.IntegerField(db_column='CdSECTS', blank=True, null=True)
+    cdsattendance = models.IntegerField(
+        db_column='CdSAttendance', blank=True, null=True)
+    jointdegree = models.CharField(
+        db_column='JointDegree', max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'CDSLIST'
