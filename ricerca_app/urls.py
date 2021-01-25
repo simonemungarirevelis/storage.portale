@@ -129,4 +129,5 @@ if 'rest_framework' in settings.INSTALLED_APPS:
     #                     api_views.ApiDidatticaLinguePerCdsList.as_view()),
 
     urlpatterns += path('{}/cdslist'.format(base_url),
-                        api_views.ApiCdSList.as_view()),
+                        api_views.ApiCdSList.as_view(),
+                        name='cdslist'),

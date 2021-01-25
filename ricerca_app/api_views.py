@@ -1,5 +1,8 @@
-from django.shortcuts import render
-from rest_framework import generics, viewsets, permissions
+from rest_framework import filters
+from django.db.models import Q
+from functools import reduce
+import operator
+from rest_framework import generics, permissions
 
 from . models import *
 from . serializers import *
@@ -229,18 +232,13 @@ class ApiRicercaLineaBaseDetail(ApiResourceDetail):
 #             return DidatticaCdsLingua.objects.filter(cdsord__cds_id=self.kwargs['pk'])
 #         return DidatticaCdsLingua.objects.all()
 
-import operator
-from functools import reduce
-from django.db.models import Q
-from rest_framework import filters
-
 
 class ApiCdSList(ApiResourceList):
     description = ''
     serializer_class = CdSListSerializer
 
     filter_backends = [filters.SearchFilter]
-    search_fields=['academicyear', 'departmentid']
+    search_fields = ['academicyear', 'departmentid']
 
     # def get_serializer(self, *args, **kwargs):
     #     ...
@@ -265,20 +263,22 @@ class ApiCdSList(ApiResourceList):
         # refine the selection if `keywords' is a non-empty list of keywords
         input_param_keywords = self.request.GET.get('keywords')
         if input_param_keywords:
-            kw = input_param_keywords.split(',')  # FIXME: cover all usual methods?
+            # FIXME: cover all usual methods?
+            kw = input_param_keywords.split(',')
             language = self.request.GET.get('language')
 
             # choose Italian as both default and fallback option, English otherwise
             if language is None or str(language).upper() == 'IT':
                 items = items.filter(
-                    reduce(operator.and_, [Q(cdsnameit__icontains=e) for e in kw])
+                    reduce(operator.and_, [
+                           Q(cdsnameit__icontains=e) for e in kw])
                 )
             else:
                 items = items.filter(
-                    reduce(operator.and_, [Q(cdsnameeng__icontains=e) for e in kw])
+                    reduce(operator.and_, [
+                           Q(cdsnameeng__icontains=e) for e in kw])
                 )
 
         # TODO: questione orderby:order
 
         return items
-
