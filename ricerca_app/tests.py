@@ -37,7 +37,7 @@ class ApiCdSListUnitTest(TestCase):
         user = ContextUnitTest.create_user(username='staff',
                                            is_staff=True)
         CdsListUnitTest.create_cdslist()
-        #url = reverse('cdslist')
+        #url = reverse('ricerca:cdslist')
         url = "/api/ricerca/cdslist"
 
         # check url
