@@ -244,6 +244,7 @@ class ApiCdSList(ApiResourceList):
 
 
 
+
     filter_backends = [filters.SearchFilter]
     search_fields = ['academicyear', 'departmentid']
 
