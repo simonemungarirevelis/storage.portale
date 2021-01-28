@@ -1,5 +1,6 @@
 from django.db import connection
 from django.test import TestCase, Client
+from django.urls import reverse
 
 from .util_test import ContextUnitTest, CdsListUnitTest
 
@@ -37,8 +38,7 @@ class ApiCdSListUnitTest(TestCase):
         user = ContextUnitTest.create_user(username='staff',
                                            is_staff=True)
         CdsListUnitTest.create_cdslist()
-        #url = reverse('ricerca:cdslist')
-        url = "/api/ricerca/cdslist"
+        url = reverse('ricerca:cdslist')
 
         # check url
         res = req.get(url)

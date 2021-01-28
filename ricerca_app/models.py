@@ -559,6 +559,16 @@ class DidatticaCds(InsModAbstract):
         managed = False
         db_table = 'DIDATTICA_CDS'
 
+    def __str__(self):
+        return '{}'.format(self.cds_id)
+
+    def cdslist(self):
+        self.cds_lingua = DidatticaCdsLingua.objects.filter(
+            cdsord_id=self.cdsord_id).first()
+
+        return self.cds_lingua
+        # da fare anche con didattica regolamento ecc ecc
+
 
 class DidatticaCdsLingua(models.Model):
     lin_did_ord_id = models.IntegerField(
