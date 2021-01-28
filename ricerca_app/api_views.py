@@ -324,12 +324,12 @@ class ApiCdSList(ApiEndpoint):
             if language is None or str(language).lower() == 'it':
                 items = items.filter(
                     reduce(operator.and_,
-                           [Q(cdsnameit__icontains=e) for e in kw])
+                           [Q(nome_cds_it__icontains=e) for e in kw])
                 )
             else:
                 items = items.filter(
                     reduce(operator.and_,
-                           [Q(cdsnameeng__icontains=e) for e in kw])
+                           [Q(nome_cds_eng__icontains=e) for e in kw])
                 )
 
         for e in items:
