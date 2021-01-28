@@ -7,10 +7,6 @@ from rest_framework import generics, permissions
 from . models import *
 from . serializers import *
 
-import json
-import os
-import socket
-
 # permissions.IsAuthenticatedOrReadOnly
 # allow authenticated users to perform any request. Requests for
 # unauthorised users will only be permitted if the request method is
