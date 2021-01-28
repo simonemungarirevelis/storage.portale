@@ -5,9 +5,9 @@ name: storage.portale
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main, dev, ymlprova ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [ main, dev, ymlprova ]
 
 jobs:
   build:
