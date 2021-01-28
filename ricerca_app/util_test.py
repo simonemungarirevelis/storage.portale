@@ -5,7 +5,6 @@ from .models import (DidatticaCds, DidatticaCdsLingua, DidatticaRegolamento, Did
 
 
 class ContextUnitTest(TestCase):
-
     @classmethod
     def create_user(cls, **kwargs):
         data = {'username': 'foo',
@@ -19,7 +18,6 @@ class ContextUnitTest(TestCase):
 
 
 class DidatticaCdsUnitTest(TestCase):
-
     @classmethod
     def create_didatticaCds(cls, **kwargs):
         data = {
@@ -30,8 +28,8 @@ class DidatticaCdsUnitTest(TestCase):
             'tipo_corso_cod': '1',
             'cla_miur_cod': '1',
             'cla_miur_des': 'laurea in informatica',
-            'cdsduration': 3,
-            'cdsects': 180,
+            'durata_anni': 3,
+            'valore_min': 180,
             'cdsord_id': 1,
         }
         for k, v in kwargs.items():
@@ -40,8 +38,8 @@ class DidatticaCdsUnitTest(TestCase):
         obj = DidatticaCds.objects.create(**data)
         return obj
 
-class DidatticaCdsLinguaUnitTest(TestCase):
 
+class DidatticaCdsLinguaUnitTest(TestCase):
     @classmethod
     def create_didatticaCdsLingua(cls, **kwargs):
         data = {
@@ -54,8 +52,8 @@ class DidatticaCdsLinguaUnitTest(TestCase):
         obj = DidatticaCdsLingua.objects.create(**data)
         return obj
 
-class DidatticaRegolamentoUnitTest(TestCase):
 
+class DidatticaRegolamentoUnitTest(TestCase):
     @classmethod
     def create_didatticaRegolamento(cls, **kwargs):
         data = {
@@ -71,8 +69,8 @@ class DidatticaRegolamentoUnitTest(TestCase):
         obj = DidatticaRegolamento.objects.create(**data)
         return obj
 
-class DidatticaDipartimentoUnitTest(TestCase):
 
+class DidatticaDipartimentoUnitTest(TestCase):
     @classmethod
     def create_didatticaDipartimento(cls, **kwargs):
         data = {

@@ -1,11 +1,12 @@
-from .filters import *
-from django.db.models import Q
-from functools import reduce
+import itertools
 import operator
-from django.shortcuts import render
-from rest_framework import generics, viewsets, permissions
 
-from .models import *
+from functools import reduce
+from rest_framework import generics, permissions
+from rest_framework.response import Response
+from django.db.models import Q
+
+from .filters import *
 from .serializers import *
 
 
@@ -236,8 +237,6 @@ class ApiRicercaLineaBaseDetail(ApiResourceDetail):
 
 
 # class ApiCdSList(ApiResourceList):
-from rest_framework.response import Response
-
 
 class ApiEndpoint(generics.GenericAPIView):
     def get(self, obj):
@@ -256,15 +255,11 @@ class ApiCdSList(ApiEndpoint):
     description = ''
     serializer_class = CdSListSerializer
     filter_backends = [ApiCdsListFilter]  # TODO
-    allowed_methods = ('GET',)
 
     # def get_serializer_context(self):
-    #     return super().get_serializer_context().update({'language': self.request.LANGUAGE_CODE})
+    #     return super().get_serializer_context().update({'language': self.request.query_params.get('language', 'it')})
 
     def get_queryset(self):
-        language = self.request.LANGUAGE_CODE
-        res = set()
-
         def get_related(obj, res_set):
             didattica_regolamento = obj.didatticaregolamento_set.all()
 
@@ -282,7 +277,6 @@ class ApiCdSList(ApiEndpoint):
             if param is not None:
                 didattica_cds_lingua = didattica_cds_lingua.filter(iso6392_cod__iexact=param)
 
-            import itertools
             res_set |= set(itertools.product(*[
                 [obj],
                 list(didattica_regolamento),
@@ -290,6 +284,8 @@ class ApiCdSList(ApiEndpoint):
             ]))
 
         items = DidatticaCds.objects.all()
+
+        language = self.request.query_params.get('language', 'it')
 
         param = self.request.query_params.get('coursetype')
         if param is not None:
@@ -332,6 +328,7 @@ class ApiCdSList(ApiEndpoint):
                            [Q(nome_cds_eng__icontains=e) for e in kw])
                 )
 
+        res = set()
         for e in items:
             get_related(e, res)
 

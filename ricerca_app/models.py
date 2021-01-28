@@ -2,7 +2,7 @@
 #   * Rearrange models' order
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
+#   * Remove `# managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -450,7 +450,7 @@ class ComuniAll(models.Model):
         db_column='DS_NAZIONE', max_length=255, blank=True, null=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = 'COMUNI_ALL'
 
 
@@ -555,7 +555,7 @@ class DidatticaCds(InsModAbstract):
         db_column='STATO_CDSORD_COD', max_length=5, blank=True, null=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = 'DIDATTICA_CDS'
 
 
@@ -574,7 +574,7 @@ class DidatticaCdsLingua(models.Model):
         db_column='LINGUA_DES_ENG', max_length=100, blank=True, null=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = 'DIDATTICA_CDS_LINGUA'
 
 
@@ -598,7 +598,7 @@ class DidatticaDipartimento(InsModAbstract):
         db_column='DIP_VIS_WEB_FLG', blank=True, null=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = 'DIDATTICA_DIPARTIMENTO'
         verbose_name_plural = _("Didattica Dipartimento")
 
@@ -628,7 +628,7 @@ class DidatticaRegolamento(InsModAbstract):
         db_column='TITOLO_CONGIUNTO_COD', max_length=100, blank=True, null=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = 'DIDATTICA_REGOLAMENTO'
 
 
@@ -655,7 +655,7 @@ class DidatticaTestiRegolamento(InsModAbstract):
     dt_mod = models.DateTimeField(db_column='DT_MOD', blank=True, null=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = 'DIDATTICA_TESTI_REGOLAMENTO'
 
 
@@ -676,7 +676,7 @@ class TerritorioIt(models.Model):
         db_column='DS_REGIONE', max_length=255, blank=True, null=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = 'TERRITORIO_IT'
 
 
@@ -716,5 +716,5 @@ class CdSList(models.Model):
         db_column='JointDegree', max_length=100, blank=True, null=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = 'CDSLIST'

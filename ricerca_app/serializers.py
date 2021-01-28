@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from . models import *
+from .models import *
 
 
 class PersonaleSerializer(serializers.HyperlinkedModelSerializer):
@@ -101,32 +101,12 @@ class RicercaLineaBaseSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CdSListSerializer(serializers.Serializer):
-    def to_dict(self,
-                cds: DidatticaCds,
-                reg: DidatticaRegolamento,
-                lan: DidatticaCdsLingua):
-        return {
-            'RegDidId': reg.regdid_id,
-            'CdSId': reg.cds_id,
-            'AcademicYear': reg.aa_reg_did,
-            'CdSNameIT': cds.nome_cds_it,
-            'CdSNameENG': cds.nome_cds_eng,
-            'DepartmentId': cds.dip.cod,
-            'DepartmentNameIT': cds.dip.dip_des_it,
-            'DepartmentNameENG': cds.dip.dip_des_eng,
-            'CourseType': cds.tipo_corso_cod,
-            'CourseClassId': cds.cla_miur_cod,
-            'CourseClassName': cds.cla_miur_des,
-            'CdSLanguage': lan.iso6392_cod,
-            'CdSDuration': cds.durata_anni,
-            'CdSECTS': cds.valore_min,
-            'CdSAttendance': reg.frequenza_obbligatoria
-        }
-
     def to_representation(self, instance):
         cds, reg, lingua = instance[:3]
         data = super().to_representation(instance)
-        data.update(self.to_dict(cds, reg, lingua))
+        data.update(self.to_dict(cds, reg, lingua,
+                                 str(self.context['request'].LANGUAGE_CODE)))
+                                 # str(self.context['language'])))
         return data
 
     def create(self, validated_data):
@@ -134,3 +114,24 @@ class CdSListSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         super().update(instance, validated_data)
+
+    @staticmethod
+    def to_dict(cds: DidatticaCds,
+                reg: DidatticaRegolamento,
+                cds_lang: DidatticaCdsLingua,
+                req_lang='en'):
+        return {
+            'RegDidId': reg.regdid_id,
+            'CdSId': reg.cds_id,
+            'AcademicYear': reg.aa_reg_did,
+            'CdSName': cds.nome_cds_it if req_lang == 'it' or cds.nome_cds_eng is None else cds.nome_cds_eng,
+            'DepartmentId': cds.dip.dip_cod,
+            'DepartmentName': cds.dip.dip_des_it if req_lang == 'it' or cds.dip.dip_des_eng is None else cds.dip.dip_des_eng,
+            'CourseType': cds.tipo_corso_cod,
+            'CourseClassId': cds.cla_miur_cod,
+            'CourseClassName': cds.cla_miur_des,
+            'CdSLanguage': cds_lang.iso6392_cod,
+            'CdSDuration': cds.durata_anni,
+            'CdSECTS': cds.valore_min,
+            'CdSAttendance': reg.frequenza_obbligatoria
+        }
