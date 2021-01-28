@@ -237,6 +237,13 @@ class ApiCdSList(ApiResourceList):
     description = ''
     serializer_class = CdSListSerializer
 
+
+
+    UNUSEDOBJECT = ""
+
+
+
+
     filter_backends = [filters.SearchFilter]
     search_fields = ['academicyear', 'departmentid']
 
