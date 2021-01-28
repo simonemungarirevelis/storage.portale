@@ -7,6 +7,8 @@ from rest_framework import generics, permissions
 from . models import *
 from . serializers import *
 
+import json
+
 
 # permissions.IsAuthenticatedOrReadOnly
 # allow authenticated users to perform any request. Requests for
@@ -236,14 +238,6 @@ class ApiRicercaLineaBaseDetail(ApiResourceDetail):
 class ApiCdSList(ApiResourceList):
     description = ''
     serializer_class = CdSListSerializer
-
-
-
-    UNUSEDOBJECT = ""
-
-
-
-
 
     filter_backends = [filters.SearchFilter]
     search_fields = ['academicyear', 'departmentid']
