@@ -111,7 +111,7 @@ class CdSListSerializer(serializers.Serializer):
             'AcademicYear': reg.aa_reg_did,
             'CdSNameIT': cds.nome_cds_it,
             'CdSNameENG': cds.nome_cds_eng,
-            'DepartmentId': cds.dip_id,
+            'DepartmentId': cds.dip.cod,
             'DepartmentNameIT': cds.dip.dip_des_it,
             'DepartmentNameENG': cds.dip.dip_des_eng,
             'CourseType': cds.tipo_corso_cod,
