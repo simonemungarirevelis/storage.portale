@@ -455,9 +455,8 @@ class ComuniAll(models.Model):
 
 
 class DidatticaCds(InsModAbstract):
-    # cds_id = models.AutoField(db_column='CDS_ID', primary_key=True)
     cds_id = models.IntegerField(
-        db_column='CDS_ID', primary_key=True)  # FIXME: AutoField
+        db_column='CDS_ID', primary_key=True)
     cds_cod = models.CharField(
         db_column='CDS_COD', max_length=10, blank=True, null=True)
     nome_cds_it = models.CharField(

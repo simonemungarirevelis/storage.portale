@@ -1,11 +1,12 @@
-from rest_framework import filters
+from .filters import *
 from django.db.models import Q
 from functools import reduce
 import operator
-from rest_framework import generics, permissions
+from django.shortcuts import render
+from rest_framework import generics, viewsets, permissions
 
-from . models import *
-from . serializers import *
+from .models import *
+from .serializers import *
 
 
 # permissions.IsAuthenticatedOrReadOnly
@@ -27,6 +28,7 @@ class ApiResourceDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         serializer.save(user_mod=self.request.user)
+
 
 # =================================================
 
@@ -233,52 +235,150 @@ class ApiRicercaLineaBaseDetail(ApiResourceDetail):
 #         return DidatticaCdsLingua.objects.all()
 
 
-class ApiCdSList(ApiResourceList):
+# class ApiCdSList(ApiResourceList):
+from rest_framework.response import Response
+
+
+class ApiEndpoint(generics.GenericAPIView):
+    def get(self, obj):
+        queryset = self.get_queryset()
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class ApiCdSList(ApiEndpoint):
     description = ''
     serializer_class = CdSListSerializer
+    filter_backends = [ApiCdsListFilter]  # TODO
+    allowed_methods = ('GET',)
 
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['academicyear', 'departmentid']
-
-    # def get_serializer(self, *args, **kwargs):
-    #     ...
+    # def get_serializer_context(self):
+    #     return super().get_serializer_context().update({'language': self.request.LANGUAGE_CODE})
 
     def get_queryset(self):
-        # all 'non-service' parameters but `keywords' (treated differently)
-        input_params = {k: self.request.GET.get(k) for k in [
-            'academicyear',
-            'departmentid',
-            'departmentname',
-            'coursetype',
-            'courseclassid',
-            'courseclassname',
-            'cdslanguage',
-            'jointdegree',
-        ]}
+        language = self.request.LANGUAGE_CODE
+        res = set()
 
-        # first filtering
-        items = CdSList.objects.filter(**{k: v for (k, v) in input_params.items()
-                                          if v})
+        def get_related(obj, res_set):
+            didattica_regolamento = obj.didatticaregolamento_set.all()
 
-        # refine the selection if `keywords' is a non-empty list of keywords
-        input_param_keywords = self.request.GET.get('keywords')
-        if input_param_keywords:
-            # FIXME: cover all usual methods?
-            kw = input_param_keywords.split(',')
-            language = self.request.GET.get('language')
+            param = self.request.query_params.get('academicyear')
+            if param is not None:
+                didattica_regolamento = didattica_regolamento.filter(aa_reg_did=param)
 
-            # choose Italian as both default and fallback option, English otherwise
-            if language is None or str(language).upper() == 'IT':
+            param = self.request.query_params.get('jointdegree')
+            if param is not None:
+                didattica_regolamento = didattica_regolamento.filter(titolo_congiunto_cod=param)
+
+            didattica_cds_lingua = obj.didatticacdslingua_set.all()
+
+            param = self.request.query_params.get('cdslanguage')
+            if param is not None:
+                didattica_cds_lingua = didattica_cds_lingua.filter(iso6392_cod__iexact=param)
+
+            import itertools
+            res_set |= set(itertools.product(*[
+                [obj],
+                list(didattica_regolamento),
+                list(didattica_cds_lingua),
+            ]))
+
+        items = DidatticaCds.objects.all()
+
+        param = self.request.query_params.get('coursetype')
+        if param is not None:
+            items = items.filter(tipo_corso_cod=param)
+
+        param = self.request.query_params.get('courseclassid')
+        if param is not None:
+            items = items.filter(cla_miur_cod=param)
+
+        param = self.request.query_params.get('courseclassname')
+        if param is not None:
+            items = items.filter(cla_miur_des__iexact=param)
+
+        param = self.request.query_params.get('courseclassgroup')
+        if param is not None:
+            ...  # unspecified atm
+
+        param = self.request.query_params.get('departmentid')
+        if param is not None:
+            items = items.filter(dip__dip_cod=param)
+
+        param = self.request.query_params.get('departmentname')
+        if param is not None:
+            # items = items.filter(dip__dip_des_it__iexact=param) \
+            #     if language == 'IT' else items.filter(dip__dip_des_eng__iexact=param)
+            items = items.filter(dip__dip_des_it__iexact=param)
+
+        param = self.request.query_params.get('keywords')
+        if param is not None:
+            kw = param.split(',')
+
+            if language is None or str(language).lower() == 'it':
                 items = items.filter(
-                    reduce(operator.and_, [
-                           Q(cdsnameit__icontains=e) for e in kw])
+                    reduce(operator.and_,
+                           [Q(cdsnameit__icontains=e) for e in kw])
                 )
             else:
                 items = items.filter(
-                    reduce(operator.and_, [
-                           Q(cdsnameeng__icontains=e) for e in kw])
+                    reduce(operator.and_,
+                           [Q(cdsnameeng__icontains=e) for e in kw])
                 )
 
-        # TODO: questione orderby:order
+        for e in items:
+            get_related(e, res)
 
-        return items
+        return res
+
+
+# class ApiCdSList(ApiResourceList):
+#     description = ''
+#     serializer_class = CdSListSerializer
+#     filter_backends = [ApiCdsListFilter]
+#
+#     def get_queryset(self):
+#         # browser's Accept-Language header
+#         # TODO: no way to force it in the URL?
+#         language = self.request.LANGUAGE_CODE
+#
+#         # all 'non-service' parameters but `keywords' (treated differently)
+#         input_params = {k: self.request.query_params.get(k) for k in [
+#             'academicyear',
+#             'departmentid',
+#             'departmentname',
+#             'coursetype',
+#             'courseclassid',
+#             'courseclassname',
+#             'cdslanguage',
+#             'jointdegree',
+#         ]}
+#
+#         # first filtering
+#         items = CdSList.objects.filter(
+#             **{k: v for (k, v) in input_params.items() if v})
+#
+#         # refine the selection if `keywords' is a non-empty list of keywords
+#         input_param_keywords = self.request.query_params.get('keywords')
+#         if input_param_keywords:
+#             kw = input_param_keywords.split(',')
+#
+#             # choose Italian as both default and fallback option, English otherwise
+#             if language is None or str(language).lower() == 'it':
+#                 items = items.filter(
+#                     reduce(operator.and_,
+#                            [Q(cdsnameit__icontains=e) for e in kw])
+#                 )
+#             else:
+#                 items = items.filter(
+#                     reduce(operator.and_,
+#                            [Q(cdsnameeng__icontains=e) for e in kw])
+#                 )
+#
+#         return items  # TODO: questione orderby:order
