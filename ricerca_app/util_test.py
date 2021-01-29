@@ -1,20 +1,21 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from .models import (DidatticaCds, DidatticaCdsLingua, DidatticaRegolamento, DidatticaDipartimento)
+from .models import (DidatticaCds, DidatticaCdsLingua, DidatticaRegolamento, DidatticaDipartimento, ComuniAll,
+                     TerritorioIt, DidatticaTestiRegolamento)
 
 
-class ContextUnitTest(TestCase):
-    @classmethod
-    def create_user(cls, **kwargs):
-        data = {'username': 'foo',
-                'first_name': 'foo',
-                'last_name': 'bar',
-                'email': 'that@mail.org'}
-        for k, v in kwargs.items():
-            data[k] = v
-        user = get_user_model().objects.create(**data)
-        return user
+# class ContextUnitTest(TestCase):
+#     @classmethod
+#     def create_user(cls, **kwargs):
+#         data = {'username': 'foo',
+#                 'first_name': 'foo',
+#                 'last_name': 'bar',
+#                 'email': 'that@mail.org'}
+#         for k, v in kwargs.items():
+#             data[k] = v
+#         user = get_user_model().objects.create(**data)
+#         return user
 
 
 class DidatticaCdsUnitTest(TestCase):
@@ -23,8 +24,7 @@ class DidatticaCdsUnitTest(TestCase):
         data = {
             'cds_id': 1,
             'nome_cds_it': 'informatica',
-            'nome_cds_eng': 'computerscience',
-            'dip_id': 1,
+            'nome_cds_eng': 'computer science',
             'tipo_corso_cod': '1',
             'cla_miur_cod': '1',
             'cla_miur_des': 'laurea in informatica',
@@ -58,7 +58,7 @@ class DidatticaRegolamentoUnitTest(TestCase):
     def create_didatticaRegolamento(cls, **kwargs):
         data = {
             'regdid_id': 1,
-            'cds_id' : 1,
+            'cds_id': 1,
             'aa_reg_did': 2020,
             'frequenza_obbligatoria': 0,
             'titolo_congiunto_cod': 'N',
@@ -67,6 +67,20 @@ class DidatticaRegolamentoUnitTest(TestCase):
             data[k] = v
 
         obj = DidatticaRegolamento.objects.create(**data)
+        return obj
+
+
+class DidatticaTestiRegolamentoUnitTest(TestCase):
+    @classmethod
+    def create_didatticaTestiRegolamento(cls, **kwargs):
+        data = {
+            'txt_id': 1,
+            'tipo_testo_regdid_cod': 'testo regolamento',
+        }
+        for k, v in kwargs.items():
+            data[k] = v
+
+        obj = DidatticaTestiRegolamento.objects.create(**data)
         return obj
 
 
@@ -83,4 +97,29 @@ class DidatticaDipartimentoUnitTest(TestCase):
             data[k] = v
 
         obj = DidatticaDipartimento.objects.create(**data)
+        return obj
+
+class ComuniAllUnitTest(TestCase):
+    @classmethod
+    def create_comuniAll(cls, **kwargs):
+        data = {
+            'id_comune': 1,
+            'ds_comune': 'comune 1',
+        }
+        for k, v in kwargs.items():
+            data[k] = v
+
+        obj = ComuniAll.objects.create(**data)
+        return obj
+
+class TerritorioItUnitTest(TestCase):
+    @classmethod
+    def create_territorioIt(cls, **kwargs):
+        data = {
+            'cd_istat': '1',
+        }
+        for k, v in kwargs.items():
+            data[k] = v
+
+        obj = TerritorioIt.objects.create(**data)
         return obj
