@@ -131,3 +131,7 @@ if 'rest_framework' in settings.INSTALLED_APPS:
     urlpatterns += path('{}/cdslist'.format(base_url),
                         api_views.ApiCdSList.as_view(),
                         name='cdslist'),
+
+    urlpatterns += path('{}/cdslistview'.format(base_url),
+                        api_views.ApiCdSListView.as_view(),
+                        name='cdslistview'),

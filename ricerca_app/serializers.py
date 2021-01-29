@@ -118,8 +118,7 @@ class CdSListSerializer(CreateUpdateAbstract):
         cds, reg, lingua = instance[:3]
         data = super().to_representation(instance)
         data.update(self.to_dict(cds, reg, lingua,
-                                 str(self.context['request'].LANGUAGE_CODE)))
-                                 # str(self.context['language'])))
+                                 str(self.context['language']).lower()))  # str(self.context['request'].LANGUAGE_CODE)))
         return data
 
     @staticmethod
@@ -142,3 +141,28 @@ class CdSListSerializer(CreateUpdateAbstract):
             'CdSECTS': cds.valore_min,
             'CdSAttendance': reg.frequenza_obbligatoria
         }
+
+
+class CdSListSerializerView(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        req_lang = str(self.context['language']).lower()  # str(self.context['request'].LANGUAGE_CODE)))
+
+        cds_name = data['cdsnameit'] if req_lang == 'it' else data['cdsnameeng']
+        department_name = data['departmentnameit'] if req_lang == 'it' else data['departmentnameeng']
+        cds_language = data['cdslanguageit'] if req_lang == 'it' else data['cdslanguageeng']
+        data.update({
+            'cdsname': cds_name,
+            'departmentname': department_name,
+            'cdslanguage': cds_language
+        })
+        for e in ['cdsnameit', 'cdsnameeng',
+                  'departmentnameit', 'departmentnameeng',
+                  'cdslanguageit', 'cdslanguageeng']:
+            data.pop(e)
+
+        return data
+
+    class Meta:
+        model = CdSList
+        fields = '__all__'
