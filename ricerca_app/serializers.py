@@ -99,8 +99,21 @@ class RicercaLineaBaseSerializer(serializers.HyperlinkedModelSerializer):
 #         model = DidatticaCdsLingua
 #         fields = ['cdsord', 'lingua_des_it', 'lingua_des_eng']
 
+class CreateUpdateAbstract(serializers.Serializer):
+    def create(self, validated_data):
+        try:
+            super().create(validated_data)
+        except:
+            pass
 
-class CdSListSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        try:
+            super().update(instance, validated_data)
+        except:
+            pass
+
+
+class CdSListSerializer(CreateUpdateAbstract):
     def to_representation(self, instance):
         cds, reg, lingua = instance[:3]
         data = super().to_representation(instance)
@@ -108,12 +121,6 @@ class CdSListSerializer(serializers.Serializer):
                                  str(self.context['request'].LANGUAGE_CODE)))
                                  # str(self.context['language'])))
         return data
-
-    def create(self, validated_data):
-        super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        super().update(instance, validated_data)
 
     @staticmethod
     def to_dict(cds: DidatticaCds,

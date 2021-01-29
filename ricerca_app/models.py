@@ -453,6 +453,9 @@ class ComuniAll(models.Model):
         # managed = False
         db_table = 'COMUNI_ALL'
 
+    def __str__(self):
+        return '{} {}'.format(self.id_comune, self.ds_comune)
+
 
 class DidatticaCds(InsModAbstract):
     cds_id = models.IntegerField(
@@ -558,6 +561,9 @@ class DidatticaCds(InsModAbstract):
         # managed = False
         db_table = 'DIDATTICA_CDS'
 
+    def __str__(self):
+        return '{} {}'.format(self.cds_id, self.nome_cds_it)
+
 
 class DidatticaCdsLingua(models.Model):
     lin_did_ord_id = models.IntegerField(
@@ -576,6 +582,9 @@ class DidatticaCdsLingua(models.Model):
     class Meta:
         # managed = False
         db_table = 'DIDATTICA_CDS_LINGUA'
+
+    def __str__(self):
+        return '{} {}'.format(self.lin_did_ord_id, self.lingua_des_it)
 
 
 class DidatticaDipartimento(InsModAbstract):
@@ -631,6 +640,9 @@ class DidatticaRegolamento(InsModAbstract):
         # managed = False
         db_table = 'DIDATTICA_REGOLAMENTO'
 
+    def __str__(self):
+        return '{} {}'.format(self.regdid_id, self.aa_reg_did)
+
 
 class DidatticaTestiRegolamento(InsModAbstract):
     txt_id = models.IntegerField(db_column='TXT_ID', primary_key=True)
@@ -658,6 +670,9 @@ class DidatticaTestiRegolamento(InsModAbstract):
         # managed = False
         db_table = 'DIDATTICA_TESTI_REGOLAMENTO'
 
+    def __str__(self):
+        return '{} {}'.format(self.txt_id, self.tipo_testo_regdid_cod)
+
 
 class TerritorioIt(models.Model):
     cd_catasto = models.OneToOneField(
@@ -678,6 +693,9 @@ class TerritorioIt(models.Model):
     class Meta:
         # managed = False
         db_table = 'TERRITORIO_IT'
+
+    def __str__(self):
+        return '{} {}'.format(self.cd_catasto, self.cd_istat)
 
 
 class CdSList(models.Model):
