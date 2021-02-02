@@ -4,7 +4,7 @@ import operator
 from functools import reduce
 from rest_framework import generics, permissions
 from rest_framework.response import Response
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 
 from .filters import *
 from .serializers import *
@@ -215,11 +215,11 @@ class ApiCdSList(ApiEndpoint):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context.update({'language': self.request.query_params.get('language', 'it')})
+        context.update({'language': str(self.request.query_params.get('language', 'it')).lower()})
         return context
 
     def get_queryset(self):
-        language = self.request.query_params.get('language', 'it')
+        language = str(self.request.query_params.get('language', 'it')).lower()
 
         didatticacds_params_to_query_field = {
             'coursetype': 'tipo_corso_cod',
@@ -227,7 +227,7 @@ class ApiCdSList(ApiEndpoint):
             'courseclassname': 'cla_miur_des__iexact',
             # 'courseclassgroup': ... unspecified atm
             'departmentid': 'dip__dip_cod',
-            'departmentname': f'dip__dip_des_{ "it" if language == "IT" else "ENG" }__iexact',
+            'departmentname': f'dip__dip_des_{ language == "it" and "it" or "eng" }__iexact',
         }
 
         didatticaregolamento_params_to_query_field = {
@@ -239,8 +239,11 @@ class ApiCdSList(ApiEndpoint):
             'cdslanguage': 'iso6392_cod__iexact',
         }
 
-        from django.db.models import Prefetch
+        keywords = set(self.request.query_params.get('keywords', '').split(','))
         items = DidatticaCds.objects\
+            .filter(reduce(operator.and_,
+                           [Q(**{f'nome_cds_{ language == "it" and "it" or "eng"}__icontains': e}) for e in keywords],
+                           Q()))\
             .filter(self.build_filter_chain(didatticacds_params_to_query_field,
                                             self.request.query_params))\
             .select_related('dip')\
@@ -265,7 +268,6 @@ class ApiCdSList(ApiEndpoint):
                 list(e.didatticacdslingua_set.all()),
             ]))
 
-        # return items
         return res_set
 
 
