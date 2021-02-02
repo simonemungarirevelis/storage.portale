@@ -73,31 +73,7 @@ class RicercaLineaBaseSerializer(serializers.HyperlinkedModelSerializer):
                   'descr_pubblicaz_prog_brevetto', 'anno']
 
 
-# ------------------------------------- #
-
-# class DidatticaDipartimentoSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = DidatticaDipartimento
-#         fields = ['dip_id', 'dip_cod', 'dip_nome_breve', 'dip_des_it']
-#
-#
-# class DidatticaCdsInDipartimentoListSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = DidatticaCds
-#         fields = ['cds_id', 'cds_cod', 'nome_cds_it', 'dip_id']
-#
-#
-# class DidatticaCdsSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = DidatticaCds
-#         fields = ['cds_id', 'cds_cod', 'nome_cds_it', 'dip_id']
-#
-#
-# # class DidatticaLinguePerCdsListSerializer(serializers.HyperlinkedModelSerializer):
-# class DidatticaLinguePerCdsListSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = DidatticaCdsLingua
-#         fields = ['cdsord', 'lingua_des_it', 'lingua_des_eng']
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 class CreateUpdateAbstract(serializers.Serializer):
     def create(self, validated_data):
@@ -143,26 +119,26 @@ class CdSListSerializer(CreateUpdateAbstract):
         }
 
 
-class CdSListSerializerView(serializers.ModelSerializer):
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        req_lang = str(self.context['language']).lower()  # str(self.context['request'].LANGUAGE_CODE)))
-
-        cds_name = data['cdsnameit'] if req_lang == 'it' else data['cdsnameeng']
-        department_name = data['departmentnameit'] if req_lang == 'it' else data['departmentnameeng']
-        cds_language = data['cdslanguageit'] if req_lang == 'it' else data['cdslanguageeng']
-        data.update({
-            'cdsname': cds_name,
-            'departmentname': department_name,
-            'cdslanguage': cds_language
-        })
-        for e in ['cdsnameit', 'cdsnameeng',
-                  'departmentnameit', 'departmentnameeng',
-                  'cdslanguageit', 'cdslanguageeng']:
-            data.pop(e)
-
-        return data
-
-    class Meta:
-        model = CdSList
-        fields = '__all__'
+# class CdSListSerializerView(serializers.ModelSerializer):
+#     def to_representation(self, instance):
+#         data = super().to_representation(instance)
+#         req_lang = str(self.context['language']).lower()  # str(self.context['request'].LANGUAGE_CODE)))
+#
+#         cds_name = data['cdsnameit'] if req_lang == 'it' else data['cdsnameeng']
+#         department_name = data['departmentnameit'] if req_lang == 'it' else data['departmentnameeng']
+#         cds_language = data['cdslanguageit'] if req_lang == 'it' else data['cdslanguageeng']
+#         data.update({
+#             'cdsname': cds_name,
+#             'departmentname': department_name,
+#             'cdslanguage': cds_language
+#         })
+#         for e in ['cdsnameit', 'cdsnameeng',
+#                   'departmentnameit', 'departmentnameeng',
+#                   'cdslanguageit', 'cdslanguageeng']:
+#             data.pop(e)
+#
+#         return data
+#
+#     class Meta:
+#         model = CdSList
+#         fields = '__all__'

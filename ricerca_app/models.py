@@ -422,8 +422,7 @@ class RicercaLineaBase(InsModAbstract):
         return '{} {}'.format(self.ricerca_erc2, self.descrizione)
 
 
-# ------------------------------------- #
-
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 class ComuniAll(models.Model):
     id_comune = models.IntegerField(db_column='ID_COMUNE', primary_key=True)
