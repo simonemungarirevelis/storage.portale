@@ -238,6 +238,7 @@ class ApiCdSList(ApiEndpoint):
         didatticacdslingua_params_to_query_field = {
             'cdslanguage': 'iso6392_cod__iexact',
         }
+        values_to_return = ('didatticaregolamento__regdid_id', 'cds_id')
 
         keywords = set(self.request.query_params.get('keywords', '').split(','))
         items = DidatticaCds.objects\
@@ -258,9 +259,25 @@ class ApiCdSList(ApiEndpoint):
                                                  didatticacdslingua_params_to_query_field,
                                                  self.request.query_params)))
                                 ])\
-            .all().distinct()
+        .all()#.values('didatticaregolamento__regdid_id',
+        #                        'didatticaregolamento__aa_reg_did',
+        #                        'didatticaregolamento__frequenza_obbligatoria',
+        #                        'dip__dip_cod',
+        #                        'dip__dip_des_it',
+        #                        'dip__dip_des_eng',
+        #                        'didatticacdslingua__iso6392_cod',
+        #                        'cds_id',
+        #                        'nome_cds_it',
+        #                        'nome_cds_eng',
+        #                        'tipo_corso_cod',
+        #                        'cla_miur_cod',
+        #                        'cla_miur_des',
+        #                        'durata_anni',
+        #                        'valore_min').distinct()
+        # print(len(items)) #535
+        # return items
 
-        res_set = set()
+        res_set = set() #103
         for e in items:
             res_set |= set(itertools.product(*[
                 [e],
@@ -268,6 +285,7 @@ class ApiCdSList(ApiEndpoint):
                 list(e.didatticacdslingua_set.all()),
             ]))
 
+        print(len(res_set))
         return res_set
 
 
