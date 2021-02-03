@@ -202,12 +202,14 @@ class ApiEndpoint(generics.GenericAPIView):
         return Response(serializer.data)
 
     @staticmethod
-    def build_filter_chain(params_dict, query_params):
-        print(reduce(operator.and_,
-                      [Q(**{v: query_params.get(k)}) for (k, v) in params_dict.items() if query_params.get(k)],
-                      Q()))
+    def build_filter_chain(params_dict, query_params, varargs=None):
+        # print(reduce(operator.and_,
+        #              [Q(**{v: query_params.get(k)})
+        #               for (k, v) in params_dict.items() if query_params.get(k)],
+        #              Q()))
         return reduce(operator.and_,
-                      [Q(**{v: query_params.get(k)}) for (k, v) in params_dict.items() if query_params.get(k)],
+                      [Q(**{v: query_params.get(k)})
+                       for (k, v) in params_dict.items() if query_params.get(k)] + (varargs or []),
                       Q())
 
 
@@ -218,7 +220,8 @@ class ApiCdSList(ApiEndpoint):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context.update({'language': str(self.request.query_params.get('language', 'it')).lower()})
+        context.update(
+            {'language': str(self.request.query_params.get('language', 'it')).lower()})
         return context
 
     def get_queryset(self):
@@ -243,47 +246,56 @@ class ApiCdSList(ApiEndpoint):
             'cdslanguage': 'didatticacdslingua__iso6392_cod__iexact',
         }
 
-        keywords = set(self.request.query_params.get('keywords', '').split(','))
+        # .filter(didatticaregolamento__stato_regdid_cod='A', didatticacdslingua__lin_did_ord_id__isnull=False)\
+        keywords = set(
+            self.request.query_params.get(
+                'keywords', '').split(','))
         items = DidatticaCds.objects\
             .filter(reduce(operator.and_,
-                           [Q(**{f'nome_cds_{ language == "it" and "it" or "eng"}__icontains': e}) for e in keywords],
+                           [Q(**{f'nome_cds_{ language == "it" and "it" or "eng"}__icontains': e})
+                            for e in keywords],
                            Q()))\
             .filter(self.build_filter_chain(didatticacds_params_to_query_field,
                                             self.request.query_params)) \
-            .filter(didatticaregolamento__stato_regdid_cod='A')\
-            .filter(self.build_filter_chain(didatticaregolamento_params_to_query_field, self.request.query_params))\
-            .filter(self.build_filter_chain(didatticacdslingua_params_to_query_field, self.request.query_params))\
-            #.filter(didatticacdslingua__lin_did_ord_id)
-            #.all()#\
-            # .select_related('dip')\
-            # .prefetch_related(*[Prefetch('didatticaregolamento_set',
-            #                              queryset=DidatticaRegolamento.objects.filter(stato_regdid_cod='A').filter(
-            #                                  self.build_filter_chain(
-            #                                      didatticaregolamento_params_to_query_field,
-            #                                      self.request.query_params))),
-            #                     Prefetch('didatticacdslingua_set',
-            #                              queryset=DidatticaCdsLingua.objects.filter(
-            #                                  self.build_filter_chain(
-            #                                      didatticacdslingua_params_to_query_field,
-            #                                      self.request.query_params)))
-            #                     ])\
-        items = items.values('didatticaregolamento__regdid_id',
-                               'didatticaregolamento__aa_reg_did',
-                               'didatticaregolamento__frequenza_obbligatoria',
-                               'dip__dip_cod',
-                               'dip__dip_des_it',
-                               'dip__dip_des_eng',
-                               'didatticacdslingua__iso6392_cod',
-                               'cds_id',
-                               'nome_cds_it',
-                               'nome_cds_eng',
-                               'tipo_corso_cod',
-                               'cla_miur_cod',
-                               'cla_miur_des',
-                               'durata_anni',
-                               'valore_min').distinct()
-        print(len(items)) #118, perché qui c'è cds_id 2039 e nella view non risulta?
+            .filter(self.build_filter_chain(didatticaregolamento_params_to_query_field,
+                                            self.request.query_params,
+                                            [Q(didatticaregolamento__stato_regdid_cod='A')]))\
+            .filter(self.build_filter_chain(didatticacdslingua_params_to_query_field,
+                                            self.request.query_params,
+                                            [Q(didatticacdslingua__lin_did_ord_id__isnull=False)]))\
+            .values('didatticaregolamento__regdid_id',
+                    'didatticaregolamento__aa_reg_did',
+                    'didatticaregolamento__frequenza_obbligatoria',
+                    'dip__dip_cod',
+                    'dip__dip_des_it',
+                    'dip__dip_des_eng',
+                    'didatticacdslingua__iso6392_cod',
+                    'cds_id',
+                    'nome_cds_it',
+                    'nome_cds_eng',
+                    'tipo_corso_cod',
+                    'cla_miur_cod',
+                    'cla_miur_des',
+                    'durata_anni',
+                    'valore_min').distinct()
+
         return items
+
+        # print(len(items)) #118, perché qui c'è cds_id 2039 e nella view non risulta?
+        # .filter(didatticacdslingua__lin_did_ord_id)
+        # .all()#\
+        # .select_related('dip')\
+        # .prefetch_related(*[Prefetch('didatticaregolamento_set',
+        #                              queryset=DidatticaRegolamento.objects.filter(stato_regdid_cod='A').filter(
+        #                                  self.build_filter_chain(
+        #                                      didatticaregolamento_params_to_query_field,
+        #                                      self.request.query_params))),
+        #                     Prefetch('didatticacdslingua_set',
+        #                              queryset=DidatticaCdsLingua.objects.filter(
+        #                                  self.build_filter_chain(
+        #                                      didatticacdslingua_params_to_query_field,
+        #                                      self.request.query_params)))
+        #                     ])\
 
         # res_set = set() #103
         # for e in items:
