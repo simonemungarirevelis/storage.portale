@@ -203,6 +203,9 @@ class ApiEndpoint(generics.GenericAPIView):
 
     @staticmethod
     def build_filter_chain(params_dict, query_params):
+        print(reduce(operator.and_,
+                      [Q(**{v: query_params.get(k)}) for (k, v) in params_dict.items() if query_params.get(k)],
+                      Q()))
         return reduce(operator.and_,
                       [Q(**{v: query_params.get(k)}) for (k, v) in params_dict.items() if query_params.get(k)],
                       Q())
@@ -220,6 +223,7 @@ class ApiCdSList(ApiEndpoint):
 
     def get_queryset(self):
         language = str(self.request.query_params.get('language', 'it')).lower()
+        print(language)
 
         didatticacds_params_to_query_field = {
             'coursetype': 'tipo_corso_cod',
@@ -231,14 +235,13 @@ class ApiCdSList(ApiEndpoint):
         }
 
         didatticaregolamento_params_to_query_field = {
-            'academicyear': 'aa_reg_did',
-            'jointdegree': 'titolo_congiunto_cod',
+            'academicyear': 'didatticaregolamento__aa_reg_did',
+            'jointdegree': 'didatticaregolamento__titolo_congiunto_cod',
         }
 
         didatticacdslingua_params_to_query_field = {
-            'cdslanguage': 'iso6392_cod__iexact',
+            'cdslanguage': 'didatticacdslingua__iso6392_cod__iexact',
         }
-        values_to_return = ('didatticaregolamento__regdid_id', 'cds_id')
 
         keywords = set(self.request.query_params.get('keywords', '').split(','))
         items = DidatticaCds.objects\
@@ -246,47 +249,52 @@ class ApiCdSList(ApiEndpoint):
                            [Q(**{f'nome_cds_{ language == "it" and "it" or "eng"}__icontains': e}) for e in keywords],
                            Q()))\
             .filter(self.build_filter_chain(didatticacds_params_to_query_field,
-                                            self.request.query_params))\
-            .select_related('dip')\
-            .prefetch_related(*[Prefetch('didatticaregolamento_set',
-                                         queryset=DidatticaRegolamento.objects.filter(stato_regdid_cod='A').filter(
-                                             self.build_filter_chain(
-                                                 didatticaregolamento_params_to_query_field,
-                                                 self.request.query_params))),
-                                Prefetch('didatticacdslingua_set',
-                                         queryset=DidatticaCdsLingua.objects.filter(
-                                             self.build_filter_chain(
-                                                 didatticacdslingua_params_to_query_field,
-                                                 self.request.query_params)))
-                                ])\
-        .all()#.values('didatticaregolamento__regdid_id',
-        #                        'didatticaregolamento__aa_reg_did',
-        #                        'didatticaregolamento__frequenza_obbligatoria',
-        #                        'dip__dip_cod',
-        #                        'dip__dip_des_it',
-        #                        'dip__dip_des_eng',
-        #                        'didatticacdslingua__iso6392_cod',
-        #                        'cds_id',
-        #                        'nome_cds_it',
-        #                        'nome_cds_eng',
-        #                        'tipo_corso_cod',
-        #                        'cla_miur_cod',
-        #                        'cla_miur_des',
-        #                        'durata_anni',
-        #                        'valore_min').distinct()
-        # print(len(items)) #535
-        # return items
+                                            self.request.query_params)) \
+            .filter(didatticaregolamento__stato_regdid_cod='A')\
+            .filter(self.build_filter_chain(didatticaregolamento_params_to_query_field, self.request.query_params))\
+            .filter(self.build_filter_chain(didatticacdslingua_params_to_query_field, self.request.query_params))\
+            #.filter(didatticacdslingua__lin_did_ord_id)
+            #.all()#\
+            # .select_related('dip')\
+            # .prefetch_related(*[Prefetch('didatticaregolamento_set',
+            #                              queryset=DidatticaRegolamento.objects.filter(stato_regdid_cod='A').filter(
+            #                                  self.build_filter_chain(
+            #                                      didatticaregolamento_params_to_query_field,
+            #                                      self.request.query_params))),
+            #                     Prefetch('didatticacdslingua_set',
+            #                              queryset=DidatticaCdsLingua.objects.filter(
+            #                                  self.build_filter_chain(
+            #                                      didatticacdslingua_params_to_query_field,
+            #                                      self.request.query_params)))
+            #                     ])\
+        items = items.values('didatticaregolamento__regdid_id',
+                               'didatticaregolamento__aa_reg_did',
+                               'didatticaregolamento__frequenza_obbligatoria',
+                               'dip__dip_cod',
+                               'dip__dip_des_it',
+                               'dip__dip_des_eng',
+                               'didatticacdslingua__iso6392_cod',
+                               'cds_id',
+                               'nome_cds_it',
+                               'nome_cds_eng',
+                               'tipo_corso_cod',
+                               'cla_miur_cod',
+                               'cla_miur_des',
+                               'durata_anni',
+                               'valore_min').distinct()
+        print(len(items)) #118, perché qui c'è cds_id 2039 e nella view non risulta?
+        return items
 
-        res_set = set() #103
-        for e in items:
-            res_set |= set(itertools.product(*[
-                [e],
-                list(e.didatticaregolamento_set.all()),
-                list(e.didatticacdslingua_set.all()),
-            ]))
-
-        print(len(res_set))
-        return res_set
+        # res_set = set() #103
+        # for e in items:
+        #     res_set |= set(itertools.product(*[
+        #         [e],
+        #         list(e.didatticaregolamento_set.all()),
+        #         list(e.didatticacdslingua_set.all()),
+        #     ]))
+        #
+        # #print(len(res_set))
+        # return res_set
 
 
 # class ApiCdSListView(ApiResourceList):
