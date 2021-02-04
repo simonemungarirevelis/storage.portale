@@ -246,7 +246,6 @@ class ApiCdSList(ApiEndpoint):
             'cdslanguage': 'didatticacdslingua__iso6392_cod__iexact',
         }
 
-        # .filter(didatticaregolamento__stato_regdid_cod='A', didatticacdslingua__lin_did_ord_id__isnull=False)\
         keywords = set(
             self.request.query_params.get(
                 'keywords', '').split(','))
@@ -281,32 +280,6 @@ class ApiCdSList(ApiEndpoint):
 
         return items
 
-        # print(len(items)) #118, perché qui c'è cds_id 2039 e nella view non risulta?
-        # .filter(didatticacdslingua__lin_did_ord_id)
-        # .all()#\
-        # .select_related('dip')\
-        # .prefetch_related(*[Prefetch('didatticaregolamento_set',
-        #                              queryset=DidatticaRegolamento.objects.filter(stato_regdid_cod='A').filter(
-        #                                  self.build_filter_chain(
-        #                                      didatticaregolamento_params_to_query_field,
-        #                                      self.request.query_params))),
-        #                     Prefetch('didatticacdslingua_set',
-        #                              queryset=DidatticaCdsLingua.objects.filter(
-        #                                  self.build_filter_chain(
-        #                                      didatticacdslingua_params_to_query_field,
-        #                                      self.request.query_params)))
-        #                     ])\
-
-        # res_set = set() #103
-        # for e in items:
-        #     res_set |= set(itertools.product(*[
-        #         [e],
-        #         list(e.didatticaregolamento_set.all()),
-        #         list(e.didatticacdslingua_set.all()),
-        #     ]))
-        #
-        # #print(len(res_set))
-        # return res_set
 
 
 # class ApiCdSListView(ApiResourceList):

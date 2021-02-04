@@ -89,38 +89,14 @@ class CreateUpdateAbstract(serializers.Serializer):
             pass
 
 
+
 class CdSListSerializer(CreateUpdateAbstract):
     def to_representation(self, instance):
-        #cds, reg, lingua = instance[:3]
         query = instance
-        #print(query)
         data = super().to_representation(instance)
-        #data.update(self.to_dict(cds, reg, lingua,
-         #                        str(self.context['language']).lower()))  # str(self.context['request'].LANGUAGE_CODE)))
         data.update(self.to_dict(query,
                                  str(self.context['language']).lower()))
         return data
-
-    # @staticmethod
-    # def to_dict(cds: DidatticaCds,
-    #             reg: DidatticaRegolamento,
-    #             cds_lang: DidatticaCdsLingua,
-    #             req_lang='en'):
-    #     return {
-    #         'RegDidId': reg.regdid_id,
-    #         'CdSId': reg.cds_id,
-    #         'AcademicYear': reg.aa_reg_did,
-    #         'CdSName': cds.nome_cds_it if req_lang == 'it' or cds.nome_cds_eng is None else cds.nome_cds_eng,
-    #         'DepartmentId': cds.dip.dip_cod,
-    #         'DepartmentName': cds.dip.dip_des_it if req_lang == 'it' or cds.dip.dip_des_eng is None else cds.dip.dip_des_eng,
-    #         'CourseType': cds.tipo_corso_cod,
-    #         'CourseClassId': cds.cla_miur_cod,
-    #         'CourseClassName': cds.cla_miur_des,
-    #         'CdSLanguage': cds_lang.iso6392_cod,
-    #         'CdSDuration': cds.durata_anni,
-    #         'CdSECTS': cds.valore_min,
-    #         'CdSAttendance': reg.frequenza_obbligatoria
-    #     }
 
     @staticmethod
     def to_dict(query,
