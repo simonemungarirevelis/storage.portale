@@ -189,7 +189,12 @@ class ApiRicercaLineaBaseDetail(ApiResourceDetail):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 class ApiEndpoint(generics.GenericAPIView):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.language = None
+
     def get(self, obj):
+        self.language = str(self.request.query_params.get('language', 'it')).lower()
         queryset = self.get_queryset()
 
         # TODO: pagination custom
@@ -200,6 +205,11 @@ class ApiEndpoint(generics.GenericAPIView):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({'language': self.language})
+        return context
 
     @staticmethod
     def build_filter_chain(params_dict, query_params, *args):
@@ -214,23 +224,14 @@ class ApiCdSList(ApiEndpoint):
     serializer_class = CdSListSerializer
     filter_backends = [ApiCdsListFilter]
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update(
-            {'language': str(self.request.query_params.get('language', 'it')).lower()})
-        return context
-
     def get_queryset(self):
-        language = str(self.request.query_params.get('language', 'it')).lower()
-        print(language)
-
         didatticacds_params_to_query_field = {
             'coursetype': 'tipo_corso_cod',
             'courseclassid': 'cla_miur_cod',
             'courseclassname': 'cla_miur_des__iexact',
             # 'courseclassgroup': ... unspecified atm
             'departmentid': 'dip__dip_cod',
-            'departmentname': f'dip__dip_des_{ language == "it" and "it" or "eng" }__iexact',
+            'departmentname': f'dip__dip_des_{ self.language == "it" and "it" or "eng" }__iexact',
         }
 
         didatticaregolamento_params_to_query_field = {
@@ -245,9 +246,10 @@ class ApiCdSList(ApiEndpoint):
         keywords = set(
             self.request.query_params.get(
                 'keywords', '').split(','))
+
         items = DidatticaCds.objects\
             .filter(reduce(operator.and_,
-                           [Q(**{f'nome_cds_{ language == "it" and "it" or "eng"}__icontains': e})
+                           [Q(**{f'nome_cds_{ self.language == "it" and "it" or "eng"}__icontains': e})
                             for e in keywords],
                            Q()))\
             .filter(self.build_filter_chain(didatticacds_params_to_query_field,
@@ -275,6 +277,12 @@ class ApiCdSList(ApiEndpoint):
                     'valore_min').distinct()
 
         return items
+
+
+# class ApiCdSInfo(ApiEndpoint):
+#     description = ''
+#     serializer_class = CdSInfoSerializer
+#     filter_backends = [ApiCdsInfoFilter]
 
 
 
