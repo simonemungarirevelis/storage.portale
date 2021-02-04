@@ -23,6 +23,8 @@ class ApiCdSListUnitTest(TestCase):
         })
         DidatticaRegolamentoUnitTest.create_didatticaRegolamento(**{
             'regdid_id': 1,
+            'stato_regdid_cod':'A',
+            'titolo_congiunto_cod':'N'
         })
 
         url = reverse('ricerca:cdslist')
@@ -32,6 +34,11 @@ class ApiCdSListUnitTest(TestCase):
         assert res.status_code == 200
 
         # GET
+
+        # param: language
+        data = {'language': 'it'}
+        res = req.get(url,data=data)
+        assert res.json()[0]['RegDidId'] == 1
 
         # param: language
         data = {'language': 'eng'}
@@ -83,6 +90,7 @@ class ApiCdSListUnitTest(TestCase):
         res = req.get(url, data=data)
         assert res.json()[0]['RegDidId'] == 1
 
+
         # param: keywords ita
         data = {'keywords': 'informatica'}
         res = req.get(url, data=data)
@@ -102,7 +110,7 @@ class ApiCdSListUnitTest(TestCase):
         data = {'cdslanguage': 'ita',
                 'jointdegree': 'N',
                 'academicyear': 2020,
-                'departmentname': 'matematica e informatica',
+                'departmentname': 'math and computer science',
                 'departmentid': 1,
                 'courseclassname': 'laurea in informatica',
                 'courseclassid': '1',
