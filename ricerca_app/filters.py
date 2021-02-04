@@ -42,3 +42,7 @@ class ApiCdsListFilter(GenericApiFilter):
 
         # TODO: update descriptions & include left parameters
     ]
+
+
+class ApiCdsInfoFilter(GenericApiFilter):
+    ...

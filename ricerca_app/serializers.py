@@ -1,3 +1,5 @@
+from abc import ABC
+
 from rest_framework import serializers
 
 from .models import *
@@ -89,7 +91,6 @@ class CreateUpdateAbstract(serializers.Serializer):
             pass
 
 
-
 class CdSListSerializer(CreateUpdateAbstract):
     def to_representation(self, instance):
         query = instance
@@ -116,6 +117,11 @@ class CdSListSerializer(CreateUpdateAbstract):
             'CdSECTS': query['valore_min'],
             'CdSAttendance': query['didatticaregolamento__frequenza_obbligatoria']
         }
+
+
+class CdsInfoSerializer(CreateUpdateAbstract):
+    def to_representation(self, instance):
+        return super().to_representation(instance)
 
 
 # class CdSListSerializerView(serializers.ModelSerializer):

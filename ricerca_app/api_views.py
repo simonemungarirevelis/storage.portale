@@ -225,6 +225,7 @@ class ApiCdSList(ApiEndpoint):
     filter_backends = [ApiCdsListFilter]
 
     def get_queryset(self):
+        # [?] move constants outside the method maybe? (also parameters for .values below)
         didatticacds_params_to_query_field = {
             'coursetype': 'tipo_corso_cod',
             'courseclassid': 'cla_miur_cod',
@@ -279,12 +280,34 @@ class ApiCdSList(ApiEndpoint):
         return items
 
 
-# class ApiCdSInfo(ApiEndpoint):
-#     description = ''
-#     serializer_class = CdSInfoSerializer
-#     filter_backends = [ApiCdsInfoFilter]
+class ApiCdSInfo(ApiEndpoint):
+    description = ''
+    serializer_class = CdsInfoSerializer
+    filter_backends = [ApiCdsInfoFilter]
 
+    # [?] Required Parameters (e.g. cdsid in this case), handle via urls?
+    def get_queryset(self):
+        cdsid_param = self.request.query_params.get('cdsid')
+        if not cdsid_param:
+            return None
 
+        texts = DidatticaTestiRegolamento.objects.filter(regdid=cdsid_param)\
+            .values('regdid__regdid_id',
+                    'regdid__aa_reg_did',
+                    'regdid__frequenza_obbligatoria',
+                    'regdid__cds__dip__dip_cod',
+                    'regdid__cds__dip__dip_des_it',
+                    'regdid__cds__dip__dip_des_eng',
+                    'regdid__cds__didatticacdslingua__iso6392_cod',
+                    'regdid__cds__cds_id',
+                    'regdid__cds__nome_cds_it',
+                    'regdid__cds__nome_cds_eng',
+                    'regdid__cds__tipo_corso_cod',
+                    'regdid__cds__cla_miur_cod',
+                    'regdid__cds__cla_miur_des',
+                    'regdid__cds__durata_anni',
+                    'regdid__cds__valore_min')
+        pass
 
 # class ApiCdSListView(ApiResourceList):
 #     description = ''
