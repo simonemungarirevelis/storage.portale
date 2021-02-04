@@ -202,14 +202,10 @@ class ApiEndpoint(generics.GenericAPIView):
         return Response(serializer.data)
 
     @staticmethod
-    def build_filter_chain(params_dict, query_params, varargs=None):
-        # print(reduce(operator.and_,
-        #              [Q(**{v: query_params.get(k)})
-        #               for (k, v) in params_dict.items() if query_params.get(k)],
-        #              Q()))
+    def build_filter_chain(params_dict, query_params, *args):
         return reduce(operator.and_,
                       [Q(**{v: query_params.get(k)})
-                       for (k, v) in params_dict.items() if query_params.get(k)] + (varargs or []),
+                       for (k, v) in params_dict.items() if query_params.get(k)] + list(args),
                       Q())
 
 
@@ -258,10 +254,10 @@ class ApiCdSList(ApiEndpoint):
                                             self.request.query_params)) \
             .filter(self.build_filter_chain(didatticaregolamento_params_to_query_field,
                                             self.request.query_params,
-                                            [Q(didatticaregolamento__stato_regdid_cod='A')]))\
+                                            Q(didatticaregolamento__stato_regdid_cod='A')))\
             .filter(self.build_filter_chain(didatticacdslingua_params_to_query_field,
                                             self.request.query_params,
-                                            [Q(didatticacdslingua__lin_did_ord_id__isnull=False)]))\
+                                            Q(didatticacdslingua__lin_did_ord_id__isnull=False)))\
             .values('didatticaregolamento__regdid_id',
                     'didatticaregolamento__aa_reg_did',
                     'didatticaregolamento__frequenza_obbligatoria',
