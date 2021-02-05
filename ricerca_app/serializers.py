@@ -41,13 +41,15 @@ class RicercaDocenteGruppoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['docente', 'ricerca_gruppo', 'dt_inizio', 'dt_fine']
 
 
-class RicercaDocenteLineaApplicataSerializer(serializers.HyperlinkedModelSerializer):
+class RicercaDocenteLineaApplicataSerializer(
+        serializers.HyperlinkedModelSerializer):
     class Meta:
         model = RicercaDocenteLineaApplicata
         fields = ['docente', 'ricerca_linea_applicata', 'dt_inizio', 'dt_fine']
 
 
-class RicercaDocenteLineaBaseSerializer(serializers.HyperlinkedModelSerializer):
+class RicercaDocenteLineaBaseSerializer(
+        serializers.HyperlinkedModelSerializer):
     class Meta:
         model = RicercaDocenteLineaBase
         fields = ['docente', 'ricerca_linea_base', 'dt_inizio', 'dt_fine']
@@ -79,13 +81,13 @@ class CreateUpdateAbstract(serializers.Serializer):
     def create(self, validated_data):
         try:
             super().create(validated_data)
-        except:
+        except BaseException:
             pass
 
     def update(self, instance, validated_data):
         try:
             super().update(instance, validated_data)
-        except:
+        except BaseException:
             pass
 
 

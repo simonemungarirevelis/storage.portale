@@ -1,16 +1,8 @@
-import itertools
-import operator
 
-from functools import reduce
 
 from django.http import QueryDict
-from django.test import Client
-from django.urls import reverse
 from rest_framework import generics, permissions
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from django.db.models import Q, Prefetch
-from silk.profiling.profiler import silk_profile
 
 
 from .filters import *
@@ -203,7 +195,9 @@ class ApiEndpoint(generics.GenericAPIView):
         self.language = None
 
     def get(self, obj):
-        self.language = str(self.request.query_params.get('language', 'it')).lower()
+        self.language = str(
+            self.request.query_params.get(
+                'language', 'it')).lower()
         queryset = self.get_queryset()
 
         # TODO: pagination custom
@@ -221,14 +215,14 @@ class ApiEndpoint(generics.GenericAPIView):
         return context
 
 
-
 class ApiCdSList(ApiEndpoint):
     description = ''
     serializer_class = CdSListSerializer
     filter_backends = [ApiCdsListFilter]
 
     def get_queryset(self):
-        return ServiceDidatticaCds.cdslist(self.language, self.request.query_params)
+        return ServiceDidatticaCds.cdslist(
+            self.language, self.request.query_params)
 
 
 class ApiCdSInfo(ApiEndpoint):
@@ -242,7 +236,9 @@ class ApiCdSInfo(ApiEndpoint):
         if not cdsid_param:
             return None
 
-        res = ServiceDidatticaCds.cdslist(self.language, QueryDict('regdid_id='+cdsid_param))
+        res = ServiceDidatticaCds.cdslist(
+            self.language, QueryDict(
+                'regdid_id=' + cdsid_param))
         res = list(res)
         texts = DidatticaTestiRegolamento.objects.filter(regdid=cdsid_param)\
             .values('regdid__regdid_id', 'clob_txt_ita', 'clob_txt_eng', 'tipo_testo_regdid_cod', 'profilo', 'profilo_eng')
@@ -266,7 +262,8 @@ class ApiCdSInfo(ApiEndpoint):
                 if text[f'{ self.language == "it" and "profilo" or "profilo_eng" }'] != last_profile:
                     last_profile = text[f'{self.language == "it" and "profilo" or "profilo_eng"}']
                     list_profiles[last_profile] = {}
-                list_profiles[last_profile][text['tipo_testo_regdid_cod']] = text[f'clob_txt_{self.language == "it" and "ita" or "eng"}']
+                list_profiles[last_profile][text['tipo_testo_regdid_cod']
+                                            ] = text[f'clob_txt_{self.language == "it" and "ita" or "eng"}']
 
         res[0]['PROFILO'] = list_profiles
         return res

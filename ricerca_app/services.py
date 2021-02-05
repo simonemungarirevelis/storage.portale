@@ -13,6 +13,7 @@ class ServiceQueryBuilder:
                        for (k, v) in params_dict.items() if query_params.get(k)] + list(args),
                       Q())
 
+
 class ServiceDidatticaCds:
     @staticmethod
     def cdslist(language, query_params):
@@ -45,13 +46,13 @@ class ServiceDidatticaCds:
                             for e in keywords],
                            Q())) \
             .filter(ServiceQueryBuilder.build_filter_chain(didatticacds_params_to_query_field,
-                                            query_params)) \
+                                                           query_params)) \
             .filter(ServiceQueryBuilder.build_filter_chain(didatticaregolamento_params_to_query_field,
-                                            query_params,
-                                            Q(didatticaregolamento__stato_regdid_cod='A'))) \
+                                                           query_params,
+                                                           Q(didatticaregolamento__stato_regdid_cod='A'))) \
             .filter(ServiceQueryBuilder.build_filter_chain(didatticacdslingua_params_to_query_field,
-                                            query_params,
-                                            Q(didatticacdslingua__lin_did_ord_id__isnull=False))) \
+                                                           query_params,
+                                                           Q(didatticacdslingua__lin_did_ord_id__isnull=False))) \
             .values('didatticaregolamento__regdid_id',
                     'didatticaregolamento__aa_reg_did',
                     'didatticaregolamento__frequenza_obbligatoria',

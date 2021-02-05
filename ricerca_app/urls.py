@@ -5,10 +5,8 @@ from rest_framework.renderers import JSONOpenAPIRenderer
 from rest_framework.schemas import get_schema_view
 from rest_framework.schemas.agid_schema_views import get_schema_view
 
-from rest_framework.schemas.openapi_agid import AgidSchemaGenerator as openapi_agid_generator
 
 
-from . import views
 from . import api_views
 
 app_name = 'ricerca'

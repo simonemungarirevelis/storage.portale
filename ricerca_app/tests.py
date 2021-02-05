@@ -1,16 +1,15 @@
-from django.db import connection
 from django.test import TestCase, Client
 from django.urls import reverse
 
 from .util_test import *
 from .serializers import CreateUpdateAbstract
 
+
 class ApiCdSListUnitTest(TestCase):
 
     def test_apicdslist(self):
         req = Client()
         #user = ContextUnitTest.create_user(username='staff',is_staff=True)
-
 
         dip = DidatticaDipartimentoUnitTest.create_didatticaDipartimento(**{
             'dip_id': 1,
@@ -19,12 +18,12 @@ class ApiCdSListUnitTest(TestCase):
             'dip': dip,
         })
         DidatticaCdsLinguaUnitTest.create_didatticaCdsLingua(**{
-           'cdsord': didatticaCds,
+            'cdsord': didatticaCds,
         })
         DidatticaRegolamentoUnitTest.create_didatticaRegolamento(**{
             'regdid_id': 1,
-            'stato_regdid_cod':'A',
-            'titolo_congiunto_cod':'N'
+            'stato_regdid_cod': 'A',
+            'titolo_congiunto_cod': 'N'
         })
 
         url = reverse('ricerca:cdslist')
@@ -37,7 +36,7 @@ class ApiCdSListUnitTest(TestCase):
 
         # param: language
         data = {'language': 'it'}
-        res = req.get(url,data=data)
+        res = req.get(url, data=data)
         assert res.json()[0]['RegDidId'] == 1
 
         # param: language
@@ -89,7 +88,6 @@ class ApiCdSListUnitTest(TestCase):
         data = {'cdslanguage': 'ita'}
         res = req.get(url, data=data)
         assert res.json()[0]['RegDidId'] == 1
-
 
         # param: keywords ita
         data = {'keywords': 'informatica'}
@@ -174,12 +172,12 @@ class ModelsToStringUnitTest(TestCase):
         })
         assert isinstance(didattica_testi_regolamento.__str__(), str)
 
+
 class ApiCdSInfoUnitTest(TestCase):
 
     def test_apicdslist(self):
         req = Client()
         #user = ContextUnitTest.create_user(username='staff',is_staff=True)
-
 
         dip = DidatticaDipartimentoUnitTest.create_didatticaDipartimento(**{
             'dip_id': 1,
@@ -188,12 +186,12 @@ class ApiCdSInfoUnitTest(TestCase):
             'dip': dip,
         })
         DidatticaCdsLinguaUnitTest.create_didatticaCdsLingua(**{
-           'cdsord': didatticaCds,
+            'cdsord': didatticaCds,
         })
         reg = DidatticaRegolamentoUnitTest.create_didatticaRegolamento(**{
             'regdid_id': 1,
-            'stato_regdid_cod':'A',
-            'titolo_congiunto_cod':'N',
+            'stato_regdid_cod': 'A',
+            'titolo_congiunto_cod': 'N',
             'cds': didatticaCds,
         })
         DidatticaTestiRegolamentoUnitTest.create_didatticaTestiRegolamento(**{
@@ -224,7 +222,7 @@ class ApiCdSInfoUnitTest(TestCase):
 
         # param: language
         data = {'language': 'it', 'cdsid': 1}
-        res = req.get(url,data=data)
+        res = req.get(url, data=data)
         assert res.json()[0]['RegDidId'] == 1
 
         # param: language
@@ -235,4 +233,5 @@ class ApiCdSInfoUnitTest(TestCase):
         # param: language
         data = {'cdsid': 1}
         res = req.get(url, data=data)
-        assert res.json()[0]['CdSProfiles']['profiloprova']['FUNZIONI'] == 'provadescrizione'
+        assert res.json()[
+            0]['CdSProfiles']['profiloprova']['FUNZIONI'] == 'provadescrizione'

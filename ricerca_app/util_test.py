@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from .models import (DidatticaCds, DidatticaCdsLingua, DidatticaRegolamento, DidatticaDipartimento, ComuniAll,
@@ -99,6 +98,7 @@ class DidatticaDipartimentoUnitTest(TestCase):
         obj = DidatticaDipartimento.objects.create(**data)
         return obj
 
+
 class ComuniAllUnitTest(TestCase):
     @classmethod
     def create_comuniAll(cls, **kwargs):
@@ -111,6 +111,7 @@ class ComuniAllUnitTest(TestCase):
 
         obj = ComuniAll.objects.create(**data)
         return obj
+
 
 class TerritorioItUnitTest(TestCase):
     @classmethod
