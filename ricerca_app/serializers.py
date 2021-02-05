@@ -147,63 +147,7 @@ class CdsInfoSerializer(CreateUpdateAbstract):
             'CdSAccess': query['REQ_ACC'],
             'CdSAdmission': query['REQ_ACC_2'],
             'CdSProfiles': query['PROFILO'],
-            # 'CdSProfileFunctions': query['FUNZIONI'],
-            # 'CdSProfileCompetencies': query['COMPETENZE'],
-            # 'CdSProfileJobOpportunities': query['SBOCCHI'],
             'CdSFinalTest': query['PROVA_FINALE'],
             'CdSFinalTestMode': query['PROVA_FINALE_2'],
             'CdSSatisfactionSurvey': query['codicione'],
-        }
-
-
-# class CdSListSerializerView(serializers.ModelSerializer):
-#     def to_representation(self, instance):
-#         data = super().to_representation(instance)
-#         req_lang = str(self.context['language']).lower()  # str(self.context['request'].LANGUAGE_CODE)))
-#
-#         cds_name = data['cdsnameit'] if req_lang == 'it' else data['cdsnameeng']
-#         department_name = data['departmentnameit'] if req_lang == 'it' else data['departmentnameeng']
-#         cds_language = data['cdslanguageit'] if req_lang == 'it' else data['cdslanguageeng']
-#         data.update({
-#             'cdsname': cds_name,
-#             'departmentname': department_name,
-#             'cdslanguage': cds_language
-#         })
-#         for e in ['cdsnameit', 'cdsnameeng',
-#                   'departmentnameit', 'departmentnameeng',
-#                   'cdslanguageit', 'cdslanguageeng']:
-#             data.pop(e)
-#
-#         return data
-#
-#     class Meta:
-#         model = CdSList
-#         fields = '__all__'
-
-class CdSStudyPlansSerializer(CreateUpdateAbstract):
-    def to_representation(self, instance):
-        query = instance
-        data = super().to_representation(instance)
-        data.update(self.to_dict(query,
-                                 str(self.context['language']).lower()))
-        return data
-
-    @staticmethod
-    def to_dict(query,
-                req_lang='en'):
-        return {
-            'StudyActivityID': query['af_id'],
-            'StudyActivityName_it': query['des'],
-            'StudyActivityName_eng': query['af_gen_des_eng'],
-            'StudyActivityCdSID': query['cds__cds_id'],
-            'StudyActivityYear': query['anno_corso'],
-            'StudyActivitySemester': query['ciclo_des'],
-            'StudyActivityECTS': query['peso'],
-            'StudyActivitySSD': query['sett_des'],
-            'StudyActivityCompulsory': query['freq_obblig_flg'],
-            'StudyActivityCdSName_it': query['cds__nome_cds_it'],
-            'StudyActivityCdSName_eng ': query['cds__nome_cds_eng'],
-            'StudyPlanId': query['pds_regdid_id'],
-            'StudyPlanName_it': query['pds_des_it'],
-            'StudyPlanName_eng': query['pds_des_eng'],
         }
