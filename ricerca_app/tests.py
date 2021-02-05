@@ -173,3 +173,66 @@ class ModelsToStringUnitTest(TestCase):
             'regdid': didattica_regolamento,
         })
         assert isinstance(didattica_testi_regolamento.__str__(), str)
+
+class ApiCdSInfoUnitTest(TestCase):
+
+    def test_apicdslist(self):
+        req = Client()
+        #user = ContextUnitTest.create_user(username='staff',is_staff=True)
+
+
+        dip = DidatticaDipartimentoUnitTest.create_didatticaDipartimento(**{
+            'dip_id': 1,
+        })
+        didatticaCds = DidatticaCdsUnitTest.create_didatticaCds(**{
+            'dip': dip,
+        })
+        DidatticaCdsLinguaUnitTest.create_didatticaCdsLingua(**{
+           'cdsord': didatticaCds,
+        })
+        reg = DidatticaRegolamentoUnitTest.create_didatticaRegolamento(**{
+            'regdid_id': 1,
+            'stato_regdid_cod':'A',
+            'titolo_congiunto_cod':'N',
+            'cds': didatticaCds,
+        })
+        DidatticaTestiRegolamentoUnitTest.create_didatticaTestiRegolamento(**{
+            'txt_id': 1,
+            'regdid': reg,
+            'tipo_testo_regdid_cod': 'DESC_COR_BRE',
+        })
+        DidatticaTestiRegolamentoUnitTest.create_didatticaTestiRegolamento(**{
+            'txt_id': 2,
+            'regdid': reg,
+            'tipo_testo_regdid_cod': 'FUNZIONI',
+            'profilo': 'profiloprova',
+            'clob_txt_ita': 'provadescrizione',
+        })
+        # DidatticaTestiRegolamentoUnitTest.create_didatticaTestiRegolamento(**{
+        #     'txt_id': 3,
+        #     'regdid': reg,
+        #     'tipo_testo_regdid_cod': 'OBB_SPEC',
+        # })
+
+        url = reverse('ricerca:cdsinfo')
+
+        # check url
+        res = req.get(url)
+        assert res.status_code == 200
+
+        # GET
+
+        # param: language
+        data = {'language': 'it', 'cdsid': 1}
+        res = req.get(url,data=data)
+        assert res.json()[0]['RegDidId'] == 1
+
+        # param: language
+        data = {'language': 'eng', 'cdsid': 1}
+        res = req.get(url, data=data)
+        assert res.json()[0]['RegDidId'] == 1
+
+        # param: language
+        data = {'cdsid': 1}
+        res = req.get(url, data=data)
+        assert res.json()[0]['CdSProfiles']['profiloprova']['FUNZIONI'] == 'provadescrizione'

@@ -3,9 +3,11 @@ import operator
 
 from functools import reduce
 
+from django.http import QueryDict
 from django.test import Client
 from django.urls import reverse
 from rest_framework import generics, permissions
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.db.models import Q, Prefetch
 from silk.profiling.profiler import silk_profile
@@ -13,6 +15,7 @@ from silk.profiling.profiler import silk_profile
 
 from .filters import *
 from .serializers import *
+from .services import *
 
 
 # permissions.IsAuthenticatedOrReadOnly
@@ -217,12 +220,6 @@ class ApiEndpoint(generics.GenericAPIView):
         context.update({'language': self.language})
         return context
 
-    @staticmethod
-    def build_filter_chain(params_dict, query_params, *args):
-        return reduce(operator.and_,
-                      [Q(**{v: query_params.get(k)})
-                       for (k, v) in params_dict.items() if query_params.get(k)] + list(args),
-                      Q())
 
 
 class ApiCdSList(ApiEndpoint):
@@ -231,66 +228,13 @@ class ApiCdSList(ApiEndpoint):
     filter_backends = [ApiCdsListFilter]
 
     def get_queryset(self):
-        # [?] move constants outside the method maybe? (also parameters for .values below)
-        didatticacds_params_to_query_field = {
-            'coursetype': 'tipo_corso_cod',
-            'courseclassid': 'cla_miur_cod',
-            'courseclassname': 'cla_miur_des__iexact',
-            # 'courseclassgroup': ... unspecified atm
-            'departmentid': 'dip__dip_cod',
-            'departmentname': f'dip__dip_des_{ self.language == "it" and "it" or "eng" }__iexact',
-        }
-
-        didatticaregolamento_params_to_query_field = {
-            'academicyear': 'didatticaregolamento__aa_reg_did',
-            'jointdegree': 'didatticaregolamento__titolo_congiunto_cod',
-            'regdid_id' : 'didatticaregolamento__regdid_id',
-        }
-
-        didatticacdslingua_params_to_query_field = {
-            'cdslanguage': 'didatticacdslingua__iso6392_cod__iexact',
-        }
-
-        keywords = set(
-            self.request.query_params.get(
-                'keywords', '').split(','))
-
-        items = DidatticaCds.objects\
-            .filter(reduce(operator.and_,
-                           [Q(**{f'nome_cds_{ self.language == "it" and "it" or "eng"}__icontains': e})
-                            for e in keywords],
-                           Q()))\
-            .filter(self.build_filter_chain(didatticacds_params_to_query_field,
-                                            self.request.query_params)) \
-            .filter(self.build_filter_chain(didatticaregolamento_params_to_query_field,
-                                            self.request.query_params,
-                                            Q(didatticaregolamento__stato_regdid_cod='A')))\
-            .filter(self.build_filter_chain(didatticacdslingua_params_to_query_field,
-                                            self.request.query_params,
-                                            Q(didatticacdslingua__lin_did_ord_id__isnull=False)))\
-            .values('didatticaregolamento__regdid_id',
-                    'didatticaregolamento__aa_reg_did',
-                    'didatticaregolamento__frequenza_obbligatoria',
-                    'dip__dip_cod',
-                    'dip__dip_des_it',
-                    'dip__dip_des_eng',
-                    'didatticacdslingua__iso6392_cod',
-                    'cds_id',
-                    'nome_cds_it',
-                    'nome_cds_eng',
-                    'tipo_corso_cod',
-                    'cla_miur_cod',
-                    'cla_miur_des',
-                    'durata_anni',
-                    'valore_min').distinct()
-
-        return items
+        return ServiceDidatticaCds.cdslist(self.language, self.request.query_params)
 
 
 class ApiCdSInfo(ApiEndpoint):
     description = ''
     serializer_class = CdsInfoSerializer
-    filter_backends = [ApiCdsInfoFilter]
+    #filter_backends = [ApiCdsInfoFilter]
 
     # [?] Required Parameters (e.g. cdsid in this case), handle via urls?
     def get_queryset(self):
@@ -298,19 +242,25 @@ class ApiCdSInfo(ApiEndpoint):
         if not cdsid_param:
             return None
 
-        req = Client()
-        url = reverse('ricerca:cdslist')
-        data = {'regdid_id': cdsid_param}
-        res = req.get(url, data=data)
-
+        res = ServiceDidatticaCds.cdslist(self.language, QueryDict('regdid_id='+cdsid_param))
+        res = list(res)
         texts = DidatticaTestiRegolamento.objects.filter(regdid=cdsid_param)\
             .values('regdid__regdid_id', 'clob_txt_ita', 'clob_txt_eng', 'tipo_testo_regdid_cod', 'profilo', 'profilo_eng')
 
         list_profiles = {}
-        last_profile = None
+        last_profile = ""
+
+        res[0]['DESC_COR_BRE'] = None
+        res[0]['OBB_SPEC'] = None
+        res[0]['REQ_ACC'] = None
+        res[0]['REQ_ACC_2'] = None
+        res[0]['PROFILO'] = None
+        res[0]['PROVA_FINALE'] = None
+        res[0]['PROVA_FINALE_2'] = None
+
         for text in texts:
             if text['tipo_testo_regdid_cod'] != 'FUNZIONI' and text['tipo_testo_regdid_cod'] != 'COMPETENZE' and text['tipo_testo_regdid_cod'] != 'SBOCCHI':
-                res.json()[0][text['tipo_testo_regdid_cod']] = text[
+                res[0][text['tipo_testo_regdid_cod']] = text[
                     f'clob_txt_{self.language == "it" and "ita" or "eng"}']
             else:
                 if text[f'{ self.language == "it" and "profilo" or "profilo_eng" }'] != last_profile:
@@ -318,8 +268,8 @@ class ApiCdSInfo(ApiEndpoint):
                     list_profiles[last_profile] = {}
                 list_profiles[last_profile][text['tipo_testo_regdid_cod']] = text[f'clob_txt_{self.language == "it" and "ita" or "eng"}']
 
-        res.json()[0]['PROFILO'] = list_profiles
-        return res.json()
+        res[0]['PROFILO'] = list_profiles
+        return res
 
 # class ApiCdSListView(ApiResourceList):
 #     description = ''
@@ -372,3 +322,21 @@ class ApiCdSInfo(ApiEndpoint):
 #                 )
 #
 #         return items
+
+class ApiCdSStudyPlans(ApiEndpoint):
+    description = ''
+    serializer_class = CdSStudyPlansSerializer
+    #filter_backends = [ApiCdsListFilter]
+
+    def get_queryset(self):
+        cdsid_param = self.request.query_params.get('cdsid')
+        if not cdsid_param:
+            return None
+
+        studyplan = DidatticaPdsRegolamento.objects.filter(regdid=cdsid_param).order_by(regdid__regdid_id) \
+            .values('regdid__regdid_id', 'pds_regdid_id', 'pds_des_it', 'pds_des_eng')
+
+        studyactivity = DidatticaOffertaFormativa .objects.filter(regdid=cdsid_param) \
+            .values('af_id', 'des', 'cds__cds_id', 'anno_corso', 'ciclo_des', 'peso', 'sett_des', 'freq_obblig_flg', 'cds__nome_cds_it', 'cds__nome_cds_eng')
+
+        return [studyplan,studyactivity]

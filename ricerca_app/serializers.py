@@ -129,19 +129,19 @@ class CdsInfoSerializer(CreateUpdateAbstract):
     def to_dict(query,
                 req_lang='en'):
         return {
-            'RegDidId': query['RegDidId'],
-            'CdSId': query['CdSId'],
-            'AcademicYear': query['AcademicYear'],
-            'CdSName': query['CdSName'],
-            'DepartmentId': query['DepartmentId'],
-            'DepartmentName': query['DepartmentName'],
-            'CourseType': query['CourseType'],
-            'CourseClassId': query['CourseClassId'],
-            'CourseClassName': query['CourseClassName'],
-            'CdSLanguage': query['CdSLanguage'],
-            'CdSDuration': query['CdSDuration'],
-            'CdSECTS': query['CdSECTS'],
-            'CdSAttendance': query['CdSAttendance'],
+            'RegDidId': query['didatticaregolamento__regdid_id'],
+            'CdSId': query['cds_id'],
+            'AcademicYear': query['didatticaregolamento__aa_reg_did'],
+            'CdSName': query['nome_cds_it'] if req_lang == 'it' or query['nome_cds_eng'] is None else query['nome_cds_eng'],
+            'DepartmentId': query['dip__dip_cod'],
+            'DepartmentName': query['dip__dip_des_it'] if req_lang == 'it' or query['dip__dip_des_eng'] is None else query['dip__dip_des_eng'],
+            'CourseType': query['tipo_corso_cod'],
+            'CourseClassId': query['cla_miur_cod'],
+            'CourseClassName': query['cla_miur_des'],
+            'CdSLanguage': query['didatticacdslingua__iso6392_cod'],
+            'CdSDuration': query['durata_anni'],
+            'CdSECTS': query['valore_min'],
+            'CdSAttendance': query['didatticaregolamento__frequenza_obbligatoria'],
             'CdSIntro': query['DESC_COR_BRE'],
             'CdSGoals': query['OBB_SPEC'],
             'CdSAccess': query['REQ_ACC'],
@@ -152,7 +152,7 @@ class CdsInfoSerializer(CreateUpdateAbstract):
             # 'CdSProfileJobOpportunities': query['SBOCCHI'],
             'CdSFinalTest': query['PROVA_FINALE'],
             'CdSFinalTestMode': query['PROVA_FINALE_2'],
-            #'CdSSatisfactionSurvey': query['codicione'],
+            'CdSSatisfactionSurvey': query['codicione'],
         }
 
 
@@ -179,3 +179,31 @@ class CdsInfoSerializer(CreateUpdateAbstract):
 #     class Meta:
 #         model = CdSList
 #         fields = '__all__'
+
+class CdSStudyPlansSerializer(CreateUpdateAbstract):
+    def to_representation(self, instance):
+        query = instance
+        data = super().to_representation(instance)
+        data.update(self.to_dict(query,
+                                 str(self.context['language']).lower()))
+        return data
+
+    @staticmethod
+    def to_dict(query,
+                req_lang='en'):
+        return {
+            'StudyActivityID': query['af_id'],
+            'StudyActivityName_it': query['des'],
+            'StudyActivityName_eng': query['af_gen_des_eng'],
+            'StudyActivityCdSID': query['cds__cds_id'],
+            'StudyActivityYear': query['anno_corso'],
+            'StudyActivitySemester': query['ciclo_des'],
+            'StudyActivityECTS': query['peso'],
+            'StudyActivitySSD': query['sett_des'],
+            'StudyActivityCompulsory': query['freq_obblig_flg'],
+            'StudyActivityCdSName_it': query['cds__nome_cds_it'],
+            'StudyActivityCdSName_eng ': query['cds__nome_cds_eng'],
+            'StudyPlanId': query['pds_regdid_id'],
+            'StudyPlanName_it': query['pds_des_it'],
+            'StudyPlanName_eng': query['pds_des_eng'],
+        }
