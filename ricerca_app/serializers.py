@@ -1,5 +1,3 @@
-from abc import ABC
-
 from rest_framework import serializers
 
 from .models import *
@@ -121,7 +119,41 @@ class CdSListSerializer(CreateUpdateAbstract):
 
 class CdsInfoSerializer(CreateUpdateAbstract):
     def to_representation(self, instance):
-        return super().to_representation(instance)
+        query = instance
+        data = super().to_representation(instance)
+        data.update(self.to_dict(query,
+                                 str(self.context['language']).lower()))
+        return data
+
+    @staticmethod
+    def to_dict(query,
+                req_lang='en'):
+        return {
+            'RegDidId': query['RegDidId'],
+            'CdSId': query['CdSId'],
+            'AcademicYear': query['AcademicYear'],
+            'CdSName': query['CdSName'],
+            'DepartmentId': query['DepartmentId'],
+            'DepartmentName': query['DepartmentName'],
+            'CourseType': query['CourseType'],
+            'CourseClassId': query['CourseClassId'],
+            'CourseClassName': query['CourseClassName'],
+            'CdSLanguage': query['CdSLanguage'],
+            'CdSDuration': query['CdSDuration'],
+            'CdSECTS': query['CdSECTS'],
+            'CdSAttendance': query['CdSAttendance'],
+            'CdSIntro': query['DESC_COR_BRE'],
+            'CdSGoals': query['OBB_SPEC'],
+            'CdSAccess': query['REQ_ACC'],
+            'CdSAdmission': query['REQ_ACC_2'],
+            'CdSProfiles': query['PROFILO'],
+            # 'CdSProfileFunctions': query['FUNZIONI'],
+            # 'CdSProfileCompetencies': query['COMPETENZE'],
+            # 'CdSProfileJobOpportunities': query['SBOCCHI'],
+            'CdSFinalTest': query['PROVA_FINALE'],
+            'CdSFinalTestMode': query['PROVA_FINALE_2'],
+            #'CdSSatisfactionSurvey': query['codicione'],
+        }
 
 
 # class CdSListSerializerView(serializers.ModelSerializer):

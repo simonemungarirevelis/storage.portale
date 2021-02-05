@@ -2,9 +2,14 @@ import itertools
 import operator
 
 from functools import reduce
+
+from django.test import Client
+from django.urls import reverse
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from django.db.models import Q, Prefetch
+from silk.profiling.profiler import silk_profile
+
 
 from .filters import *
 from .serializers import *
@@ -188,6 +193,7 @@ class ApiRicercaLineaBaseDetail(ApiResourceDetail):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
+
 class ApiEndpoint(generics.GenericAPIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -238,6 +244,7 @@ class ApiCdSList(ApiEndpoint):
         didatticaregolamento_params_to_query_field = {
             'academicyear': 'didatticaregolamento__aa_reg_did',
             'jointdegree': 'didatticaregolamento__titolo_congiunto_cod',
+            'regdid_id' : 'didatticaregolamento__regdid_id',
         }
 
         didatticacdslingua_params_to_query_field = {
@@ -291,23 +298,28 @@ class ApiCdSInfo(ApiEndpoint):
         if not cdsid_param:
             return None
 
+        req = Client()
+        url = reverse('ricerca:cdslist')
+        data = {'regdid_id': cdsid_param}
+        res = req.get(url, data=data)
+
         texts = DidatticaTestiRegolamento.objects.filter(regdid=cdsid_param)\
-            .values('regdid__regdid_id',
-                    'regdid__aa_reg_did',
-                    'regdid__frequenza_obbligatoria',
-                    'regdid__cds__dip__dip_cod',
-                    'regdid__cds__dip__dip_des_it',
-                    'regdid__cds__dip__dip_des_eng',
-                    'regdid__cds__didatticacdslingua__iso6392_cod',
-                    'regdid__cds__cds_id',
-                    'regdid__cds__nome_cds_it',
-                    'regdid__cds__nome_cds_eng',
-                    'regdid__cds__tipo_corso_cod',
-                    'regdid__cds__cla_miur_cod',
-                    'regdid__cds__cla_miur_des',
-                    'regdid__cds__durata_anni',
-                    'regdid__cds__valore_min')
-        pass
+            .values('regdid__regdid_id', 'clob_txt_ita', 'clob_txt_eng', 'tipo_testo_regdid_cod', 'profilo', 'profilo_eng')
+
+        list_profiles = {}
+        last_profile = None
+        for text in texts:
+            if text['tipo_testo_regdid_cod'] != 'FUNZIONI' and text['tipo_testo_regdid_cod'] != 'COMPETENZE' and text['tipo_testo_regdid_cod'] != 'SBOCCHI':
+                res.json()[0][text['tipo_testo_regdid_cod']] = text[
+                    f'clob_txt_{self.language == "it" and "ita" or "eng"}']
+            else:
+                if text[f'{ self.language == "it" and "profilo" or "profilo_eng" }'] != last_profile:
+                    last_profile = text[f'{self.language == "it" and "profilo" or "profilo_eng"}']
+                    list_profiles[last_profile] = {}
+                list_profiles[last_profile][text['tipo_testo_regdid_cod']] = text[f'clob_txt_{self.language == "it" and "ita" or "eng"}']
+
+        res.json()[0]['PROFILO'] = list_profiles
+        return res.json()
 
 # class ApiCdSListView(ApiResourceList):
 #     description = ''
